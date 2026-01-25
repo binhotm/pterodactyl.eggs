@@ -1,0 +1,366 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-01-24T00:00:00+00:00",
+    "name": "Arma Reforger",
+    "author": "fabriciojuniorsilva@gmail.com",
+    "description": "Experience authentic Cold War combat and join friends in the struggle for a sprawling, 51 km² mid-Atlantic island — or take on the role of Game Master and create your very own scenarios for others to enjoy. Enhanced with A2S, RCON, Crossplay, and advanced operational settings.",
+    "tags": [],
+    "features": [
+        "steam_disk_space",
+        "pid_limit"
+    ],
+    "docker_images": {
+        "cm2network/steamcmd:latest": "cm2network/steamcmd:latest"
+    },
+    "file_denylist": [],
+    "startup": "sed -i 's/\"true\"/true/g; s/\"false\"/false/g' config.json; ./ArmaReforgerServer -config ./config.json -profile ./profile -listScenarios -logStats $(({{LOG_INTERVAL}}*1000)) -maxFPS {{MAX_FPS}} -rpl-timeout-ms 30000",
+    "config": {
+        "files": "{\n    \"config.json\": {\n        \"parser\": \"json\",\n        \"find\": {\n            \"bindAddress\": \"0.0.0.0\",\n            \"bindPort\": \"{{server.build.default.port}}\",\n            \"publicAddress\": \"{{server.build.default.ip}}\",\n            \"publicPort\": \"{{server.build.default.port}}\",\n            \"a2s.address\": \"{{server.build.env.A2S_ADDRESS}}\",\n            \"a2s.port\": \"{{server.build.env.A2S_PORT}}\",\n            \"rcon.address\": \"{{server.build.env.RCON_ADDRESS}}\",\n            \"rcon.port\": \"{{server.build.env.RCON_PORT}}\",\n            \"rcon.password\": \"{{server.build.env.RCON_PASSWORD}}\",\n            \"rcon.permission\": \"admin\",\n            \"game.name\": \"{{server.build.env.SERVER_NAME}}\",\n            \"game.password\": \"{{server.build.env.SERVER_PASS}}\",\n            \"game.passwordAdmin\": \"{{server.build.env.ADMIN_PASS}}\",\n            \"game.scenarioId\": \"{{server.build.env.SCENARIO_ID}}\",\n            \"game.maxPlayers\": \"{{server.build.env.MAX_PLAYERS}}\",\n            \"game.visible\": \"{{server.build.env.VISIBLE}}\",\n            \"game.crossPlatform\": \"{{server.build.env.CROSS_PLATFORM}}\",\n            \"game.modsRequiredByDefault\": \"{{server.build.env.MODS_REQUIRED}}\",\n            \"game.gameProperties.serverMaxViewDistance\": \"{{server.build.env.MAX_VIEW_DISTANCE}}\",\n            \"game.gameProperties.serverMinGrassDistance\": \"{{server.build.env.MIN_GRASS_DISTANCE}}\",\n            \"game.gameProperties.networkViewDistance\": \"{{server.build.env.NETWORK_VIEW_DISTANCE}}\",\n            \"game.gameProperties.disableThirdPerson\": \"{{server.build.env.DISABLE_THIRD}}\",\n            \"game.gameProperties.fastValidation\": true,\n            \"game.gameProperties.battlEye\": \"{{server.build.env.BATTLEYE}}\",\n            \"game.gameProperties.VONDisableUI\": \"{{server.build.env.VON_DISABLE_UI}}\",\n            \"game.gameProperties.VONDisableDirectSpeechUI\": \"{{server.build.env.VON_DISABLE_DIRECT_UI}}\",\n            \"game.gameProperties.VONCanTransmitCrossFaction\": \"{{server.build.env.VON_CROSS_FACTION}}\",\n            \"operating.aiLimit\": \"{{server.build.env.AI_LIMIT}}\",\n            \"operating.disableAI\": \"{{server.build.env.DISABLE_AI}}\",\n            \"operating.disableServerShutdown\": \"{{server.build.env.DISABLE_SHUTDOWN}}\",\n            \"operating.joinQueue.maxSize\": \"{{server.build.env.QUEUE_MAX_SIZE}}\",\n            \"operating.playerSaveTime\": \"{{server.build.env.PLAYER_SAVE_TIME}}\",\n            \"operating.slotReservationTimeout\": \"{{server.build.env.SLOT_RESERVATION_TIMEOUT}}\"\n        }\n    }\n}",
+        "startup": "{\n    \"done\": \"Starting RPL server\"\n}",
+        "logs": "{}",
+        "stop": "^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\\r\\n# Arma Reforger Installation Script\\r\\n# Container: cm2network/steamcmd:root (runs as ROOT during install)\\r\\n# Runtime: cm2network/steamcmd:latest (runs as non-root)\\r\\n#\\r\\n# Server Files: /mnt/server (becomes /home/container at runtime)\\r\\n\\r\\n##\\r\\n# Variables\\r\\n# SRCDS_APPID - 1874900 (Arma Reforger Dedicated Server)\\r\\n##\\r\\n\\r\\ncd /mnt/server\\r\\n\\r\\necho \\\"==========================================\\\"\\r\\necho \\\"Arma Reforger Server - Installation\\\"\\r\\necho \\\"==========================================\\\"\\r\\n\\r\\n## Check if jq is available (should be in custom Docker image)\\r\\nif ! command -v jq &> /dev/null; then\\r\\n    echo \\\"[1/6] Installing jq for JSON validation...\\\"\\r\\n    apt-get update > /dev/null 2>&1\\r\\n    apt-get install -y --no-install-recommends jq > /dev/null 2>&1\\r\\nelse\\r\\n    echo \\\"[1/6] Dependencies verified (jq available)\\\"\\r\\nfi\\r\\n\\r\\n## Clean input variables\\r\\nSERVER_NAME=\\\"$(echo \\\"$SERVER_NAME\\\" | xargs)\\\"\\r\\nRCON_PASSWORD=\\\"$(echo \\\"$RCON_PASSWORD\\\" | xargs)\\\"\\r\\nADMIN_PASS=\\\"$(echo \\\"$ADMIN_PASS\\\" | xargs)\\\"\\r\\n\\r\\n## Set default steam credentials\\r\\nif [ -z \\\"${STEAM_USER}\\\" ] || [ -z \\\"${STEAM_PASS}\\\" ]; then\\r\\n    echo \\\"[2/6] Using anonymous Steam login...\\\"\\r\\n    STEAM_USER=anonymous\\r\\n    STEAM_PASS=\\\"\\\"\\r\\n    STEAM_AUTH=\\\"\\\"\\r\\nelse\\r\\n    echo \\\"[2/6] Using Steam account: ${STEAM_USER}\\\"\\r\\nfi\\r\\n\\r\\n## Create required directories\\r\\necho \\\"[3/6] Creating server directories...\\\"\\r\\nmkdir -p /mnt/server/profile /mnt/server/tmp\\r\\n\\r\\n## Fix permissions for steam user\\r\\nchown -R steam:steam /mnt/server\\r\\n\\r\\n## Install game files via SteamCMD (must run as 'steam' user, not root)\\r\\necho \\\"[4/6] Downloading Arma Reforger Server files (App ID: ${SRCDS_APPID})...\\\"\\r\\necho \\\"This may take several minutes depending on your connection...\\\"\\r\\n\\r\\nsu - steam -c \\\"/home/steam/steamcmd/steamcmd.sh +force_install_dir /mnt/server +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} +app_update ${SRCDS_APPID} ${INSTALL_FLAGS} validate +quit\\\"\\r\\n\\r\\n## Verify installation\\r\\nif [ ! -f \\\"/mnt/server/ArmaReforgerServer\\\" ]; then\\r\\n    echo \\\"==========================================\\\"\\r\\n    echo \\\"ERROR: Installation failed!\\\"\\r\\n    echo \\\"The ArmaReforgerServer executable was not found.\\\"\\r\\n    echo \\\"==========================================\\\"\\r\\n    echo \\\"Possible causes:\\\"\\r\\n    echo \\\"  - Invalid Steam credentials\\\"\\r\\n    echo \\\"  - Network connectivity issues\\\"\\r\\n    echo \\\"  - Insufficient disk space\\\"\\r\\n    echo \\\"  - Steam service is down\\\"\\r\\n    echo \\\"==========================================\\\"\\r\\n    exit 1\\r\\nfi\\r\\n\\r\\n## Generate initial config.json\\r\\necho \\\"[5/6] Generating default configuration...\\\"\\r\\ncat > /mnt/server/config.json << 'EOFCONFIG'\\r\\n{\\r\\n\t\\\"bindAddress\\\": \\\"0.0.0.0\\\",\\r\\n\t\\\"bindPort\\\": SERVER_PORT_PLACEHOLDER,\\r\\n\t\\\"publicAddress\\\": \\\"SERVER_IP_PLACEHOLDER\\\",\\r\\n\t\\\"publicPort\\\": SERVER_PORT_PLACEHOLDER,\\r\\n\t\\\"a2s\\\": {\\r\\n\t\t\\\"address\\\": \\\"A2S_ADDRESS_PLACEHOLDER\\\",\\r\\n\t\t\\\"port\\\": A2S_PORT_PLACEHOLDER\\r\\n\t},\\r\\n\t\\\"rcon\\\": {\\r\\n\t\t\\\"address\\\": \\\"RCON_ADDRESS_PLACEHOLDER\\\",\\r\\n\t\t\\\"port\\\": RCON_PORT_PLACEHOLDER,\\r\\n\t\t\\\"password\\\": \\\"RCON_PASSWORD_PLACEHOLDER\\\",\\r\\n\t\t\\\"permission\\\": \\\"admin\\\"\\r\\n\t},\\r\\n\t\\\"game\\\": {\\r\\n\t\t\\\"name\\\": \\\"SERVER_NAME_PLACEHOLDER\\\",\\r\\n\t\t\\\"password\\\": \\\"SERVER_PASS_PLACEHOLDER\\\",\\r\\n\t\t\\\"passwordAdmin\\\": \\\"ADMIN_PASS_PLACEHOLDER\\\",\\r\\n\t\t\\\"admins\\\": [],\\r\\n\t\t\\\"scenarioId\\\": \\\"SCENARIO_ID_PLACEHOLDER\\\",\\r\\n\t\t\\\"maxPlayers\\\": MAX_PLAYERS_PLACEHOLDER,\\r\\n\t\t\\\"visible\\\": VISIBLE_PLACEHOLDER,\\r\\n\t\t\\\"crossPlatform\\\": CROSS_PLATFORM_PLACEHOLDER,\\r\\n\t\t\\\"supportedPlatforms\\\": [\\\"PLATFORM_PC\\\", \\\"PLATFORM_XBL\\\", \\\"PLATFORM_PSN\\\"],\\r\\n\t\t\\\"gameProperties\\\": {\\r\\n\t\t\t\\\"serverMaxViewDistance\\\": MAX_VIEW_DISTANCE_PLACEHOLDER,\\r\\n\t\t\t\\\"serverMinGrassDistance\\\": MIN_GRASS_DISTANCE_PLACEHOLDER,\\r\\n\t\t\t\\\"networkViewDistance\\\": NETWORK_VIEW_DISTANCE_PLACEHOLDER,\\r\\n\t\t\t\\\"disableThirdPerson\\\": DISABLE_THIRD_PLACEHOLDER,\\r\\n\t\t\t\\\"fastValidation\\\": true,\\r\\n\t\t\t\\\"battlEye\\\": BATTLEYE_PLACEHOLDER,\\r\\n\t\t\t\\\"VONDisableUI\\\": VON_DISABLE_UI_PLACEHOLDER,\\r\\n\t\t\t\\\"VONDisableDirectSpeechUI\\\": VON_DISABLE_DIRECT_UI_PLACEHOLDER,\\r\\n\t\t\t\\\"VONCanTransmitCrossFaction\\\": VON_CROSS_FACTION_PLACEHOLDER,\\r\\n\t\t\t\\\"missionHeader\\\": {}\\r\\n\t\t},\\r\\n\t\t\\\"modsRequiredByDefault\\\": MODS_REQUIRED_PLACEHOLDER,\\r\\n\t\t\\\"mods\\\": MODS_JSON_PLACEHOLDER\\r\\n\t},\\r\\n\t\\\"operating\\\": {\\r\\n\t\t\\\"aiLimit\\\": AI_LIMIT_PLACEHOLDER,\\r\\n\t\t\\\"disableAI\\\": DISABLE_AI_PLACEHOLDER,\\r\\n\t\t\\\"disableCrashReporter\\\": false,\\r\\n\t\t\\\"disableNavmeshStreaming\\\": [],\\r\\n\t\t\\\"disableServerShutdown\\\": DISABLE_SHUTDOWN_PLACEHOLDER,\\r\\n\t\t\\\"joinQueue\\\": {\\r\\n\t\t\t\\\"maxSize\\\": QUEUE_MAX_SIZE_PLACEHOLDER\\r\\n\t\t},\\r\\n\t\t\\\"lobbyPlayerSynchronise\\\": true,\\r\\n\t\t\\\"playerSaveTime\\\": PLAYER_SAVE_TIME_PLACEHOLDER,\\r\\n\t\t\\\"slotReservationTimeout\\\": SLOT_RESERVATION_TIMEOUT_PLACEHOLDER\\r\\n\t}\\r\\n}\\r\\nEOFCONFIG\\r\\n\\r\\n## Replace placeholders with actual values using sed\\r\\nsed -i \\\"s/SERVER_PORT_PLACEHOLDER/${SERVER_PORT}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/SERVER_IP_PLACEHOLDER/${SERVER_IP}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/A2S_ADDRESS_PLACEHOLDER/${A2S_ADDRESS}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/A2S_PORT_PLACEHOLDER/${A2S_PORT}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/RCON_ADDRESS_PLACEHOLDER/${RCON_ADDRESS}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/RCON_PORT_PLACEHOLDER/${RCON_PORT}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/RCON_PASSWORD_PLACEHOLDER/${RCON_PASSWORD}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/SERVER_NAME_PLACEHOLDER/${SERVER_NAME}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/SERVER_PASS_PLACEHOLDER/${SERVER_PASS}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/ADMIN_PASS_PLACEHOLDER/${ADMIN_PASS}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s|SCENARIO_ID_PLACEHOLDER|${SCENARIO_ID}|g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/MAX_PLAYERS_PLACEHOLDER/${MAX_PLAYERS}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/VISIBLE_PLACEHOLDER/${VISIBLE}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/CROSS_PLATFORM_PLACEHOLDER/${CROSS_PLATFORM}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/MAX_VIEW_DISTANCE_PLACEHOLDER/${MAX_VIEW_DISTANCE}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/MIN_GRASS_DISTANCE_PLACEHOLDER/${MIN_GRASS_DISTANCE}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/NETWORK_VIEW_DISTANCE_PLACEHOLDER/${NETWORK_VIEW_DISTANCE}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/DISABLE_THIRD_PLACEHOLDER/${DISABLE_THIRD}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/BATTLEYE_PLACEHOLDER/${BATTLEYE}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/VON_DISABLE_UI_PLACEHOLDER/${VON_DISABLE_UI}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/VON_DISABLE_DIRECT_UI_PLACEHOLDER/${VON_DISABLE_DIRECT_UI}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/VON_CROSS_FACTION_PLACEHOLDER/${VON_CROSS_FACTION}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/MODS_REQUIRED_PLACEHOLDER/${MODS_REQUIRED}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/MODS_JSON_PLACEHOLDER/${MODS_JSON}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/AI_LIMIT_PLACEHOLDER/${AI_LIMIT}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/DISABLE_AI_PLACEHOLDER/${DISABLE_AI}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/DISABLE_SHUTDOWN_PLACEHOLDER/${DISABLE_SHUTDOWN}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/QUEUE_MAX_SIZE_PLACEHOLDER/${QUEUE_MAX_SIZE}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/PLAYER_SAVE_TIME_PLACEHOLDER/${PLAYER_SAVE_TIME}/g\\\" /mnt/server/config.json\\r\\nsed -i \\\"s/SLOT_RESERVATION_TIMEOUT_PLACEHOLDER/${SLOT_RESERVATION_TIMEOUT}/g\\\" /mnt/server/config.json\\r\\n\\r\\n## Validate generated config.json\\r\\necho \\\"[6/6] Validating configuration file...\\\"\\r\\nif jq empty /mnt/server/config.json 2>/dev/null; then\\r\\n    echo \\\"✓ config.json is valid JSON\\\"\\r\\nelse\\r\\n    echo \\\"==========================================\\\"\\r\\n    echo \\\"ERROR: config.json validation failed!\\\"\\r\\n    echo \\\"The generated configuration contains invalid JSON.\\\"\\r\\n    echo \\\"==========================================\\\"\\r\\n    echo \\\"Debugging info:\\\"\\r\\n    jq empty /mnt/server/config.json 2>&1\\r\\n    echo \\\"==========================================\\\"\\r\\n    exit 1\\r\\nfi\\r\\n\\r\\n## Fix permissions one more time\\r\\nchown -R steam:steam /mnt/server\\r\\n\\r\\necho \\\"==========================================\\\"\\r\\necho \\\"Installation completed successfully!\\\"\\r\\necho \\\"Server binary: /mnt/server/ArmaReforgerServer\\\"\\r\\necho \\\"Config file: /mnt/server/config.json (validated)\\\"\\r\\necho \\\"Profile directory: /mnt/server/profile\\\"\\r\\necho \\\"==========================================\\\"\\r\\n",
+            "container": "cm2network/steamcmd:root",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Admin Password",
+            "description": "",
+            "env_variable": "ADMIN_PASS",
+            "default_value": "gmaster@999",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:32",
+            "field_type": "text"
+        },
+        {
+            "name": "Automatic Updates",
+            "description": "Quickly checks for any server or mod updates on startup, and updates if necessary.",
+            "env_variable": "AUTO_UPDATE",
+            "default_value": "1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "Disable Third Person",
+            "description": "",
+            "env_variable": "DISABLE_THIRD",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Enable BattlEye",
+            "description": "Enables the anti-cheat engine on the server and requires all clients to be running it.",
+            "env_variable": "BATTLEYE",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Max Players",
+            "description": "Maximum number of players allowed to join the server.",
+            "env_variable": "MAX_PLAYERS",
+            "default_value": "128",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1,256",
+            "field_type": "text"
+        },
+        {
+            "name": "Scenario ID",
+            "description": "ID of scenario to run/play. Valid IDs can be viewed in the console upon startup of the server.",
+            "env_variable": "SCENARIO_ID",
+            "default_value": "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Server Name",
+            "description": "Name displayed in the server browser.",
+            "env_variable": "SERVER_NAME",
+            "default_value": "Arma Reforger Server",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:255",
+            "field_type": "text"
+        },
+        {
+            "name": "Server Password",
+            "description": "Password required for clients to enter before they can join the server. Leave empty to have no password.",
+            "env_variable": "SERVER_PASS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:32",
+            "field_type": "text"
+        },
+        {
+            "name": "Visible in Server Browser",
+            "description": "Set the visibility of the server in the Server Browser.",
+            "env_variable": "VISIBLE",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "[Advanced] Arma Reforger Dedicated Server App ID",
+            "description": "Used for installation and updates. Rarely needs to be changed.",
+            "env_variable": "SRCDS_APPID",
+            "default_value": "1874900",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|integer",
+            "field_type": "text"
+        },
+        {
+            "name": "[Advanced] Log FPS Interval",
+            "description": "How often (in seconds) to log the FPS and other debug stats to the console. Set to 0 to disable.",
+            "env_variable": "LOG_INTERVAL",
+            "default_value": "1000",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|min:0",
+            "field_type": "text"
+        },
+        {
+            "name": "[Advanced] Max FPS",
+            "description": "Sets a maximum FPS limit for the server, saving performance in some cases. Leave empty for no limit.",
+            "env_variable": "MAX_FPS",
+            "default_value": "120",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|integer|gt:0",
+            "field_type": "text"
+        },
+        {
+            "name": "[Repair] Validate Server Files",
+            "description": "\"true\" to enable; empty to disable. Validates all server files when Automatic Updates is enabled. Note: This will significantly increase server startup times, so it is recommended to only enable this when needed.",
+            "env_variable": "VALIDATE",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "[Network] A2S Address",
+            "description": "Steam Query (A2S) bind address. Use 0.0.0.0 for all interfaces.",
+            "env_variable": "A2S_ADDRESS",
+            "default_value": "0.0.0.0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "[Network] A2S Port",
+            "description": "Steam Query (A2S) port for server listing and info.",
+            "env_variable": "A2S_PORT",
+            "default_value": "17777",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1024,65535",
+            "field_type": "text"
+        },
+        {
+            "name": "[Network] RCON Address",
+            "description": "RCON bind address for remote administration. Use 0.0.0.0 for all interfaces.",
+            "env_variable": "RCON_ADDRESS",
+            "default_value": "0.0.0.0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "[Network] RCON Port",
+            "description": "RCON port for remote server administration.",
+            "env_variable": "RCON_PORT",
+            "default_value": "19998",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1024,65535",
+            "field_type": "text"
+        },
+        {
+            "name": "[Network] RCON Password",
+            "description": "Password for RCON remote administration access.",
+            "env_variable": "RCON_PASSWORD",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:64",
+            "field_type": "text"
+        },
+        {
+            "name": "[Gameplay] Enable Crossplay",
+            "description": "Enable crossplay between PC, Xbox, and PlayStation platforms.",
+            "env_variable": "CROSS_PLATFORM",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "[Gameplay] Mods Required By Default",
+            "description": "If true, all server mods are required for players to join.",
+            "env_variable": "MODS_REQUIRED",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "[Mods] Mods List (JSON)",
+            "description": "JSON array of mods. Format: [{\"name\":\"ModName\",\"modId\":\"ID\",\"version\":\"1.0.0\"}]. Leave as [] for no mods. Use https://jsonlint.com to validate your JSON before pasting.",
+            "env_variable": "MODS_JSON",
+            "default_value": "[]",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "[Graphics] Max View Distance",
+            "description": "Maximum view distance in meters (serverMaxViewDistance).",
+            "env_variable": "MAX_VIEW_DISTANCE",
+            "default_value": "5000",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:500,10000",
+            "field_type": "text"
+        },
+        {
+            "name": "[Graphics] Min Grass Distance",
+            "description": "Minimum grass rendering distance in meters (serverMinGrassDistance).",
+            "env_variable": "MIN_GRASS_DISTANCE",
+            "default_value": "150",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:0,500",
+            "field_type": "text"
+        },
+        {
+            "name": "[Graphics] Network View Distance",
+            "description": "Network synchronization view distance in meters.",
+            "env_variable": "NETWORK_VIEW_DISTANCE",
+            "default_value": "1500",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:500,5000",
+            "field_type": "text"
+        },
+        {
+            "name": "[Voice] VON Disable UI",
+            "description": "Disable Voice-over-Network UI elements.",
+            "env_variable": "VON_DISABLE_UI",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "[Voice] VON Disable Direct Speech UI",
+            "description": "Disable direct speech UI in Voice-over-Network.",
+            "env_variable": "VON_DISABLE_DIRECT_UI",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "[Voice] VON Cross Faction Communication",
+            "description": "Allow voice communication between opposing factions.",
+            "env_variable": "VON_CROSS_FACTION",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "[Operating] AI Limit",
+            "description": "Maximum number of AI units. Set to -1 for unlimited.",
+            "env_variable": "AI_LIMIT",
+            "default_value": "-1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|min:-1",
+            "field_type": "text"
+        },
+        {
+            "name": "[Operating] Disable AI",
+            "description": "Completely disable AI on the server.",
+            "env_variable": "DISABLE_AI",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "[Operating] Disable Server Shutdown",
+            "description": "Prevent automatic server shutdown.",
+            "env_variable": "DISABLE_SHUTDOWN",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "[Operating] Join Queue Max Size",
+            "description": "Maximum number of players that can be in the join queue.",
+            "env_variable": "QUEUE_MAX_SIZE",
+            "default_value": "45",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:0,500",
+            "field_type": "text"
+        },
+        {
+            "name": "[Operating] Player Save Time",
+            "description": "Interval in seconds to save player data.",
+            "env_variable": "PLAYER_SAVE_TIME",
+            "default_value": "120",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:30,600",
+            "field_type": "text"
+        },
+        {
+            "name": "[Operating] Slot Reservation Timeout",
+            "description": "Time in seconds before a reserved slot expires.",
+            "env_variable": "SLOT_RESERVATION_TIMEOUT",
+            "default_value": "60",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:10,300",
+            "field_type": "text"
+        }
+    ]
+}
