@@ -9,8 +9,8 @@ set -e
 cd "$(dirname "$0")/.."
 
 # Define variables
-IMAGE_NAME="pterodactyl-steamcmd-eggs/installer"
-IMAGE_TAG="arma-reforger"
+IMAGE_NAME="steamcmd/installer"
+IMAGE_TAG="egg"
 DOCKER_DIR="docker/arma-reforger"
 
 echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"

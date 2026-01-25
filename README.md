@@ -52,4 +52,4 @@ Contributions are welcome! If you have improvements for the install scripts or n
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-*Maintained by Fabricio Junior (SAS BR Team)*
+*Maintained by Fabricio Junior (BinhoTM)*
