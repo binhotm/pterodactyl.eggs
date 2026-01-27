@@ -43,6 +43,103 @@ The installation process performs the following operations:
 6. Variable substitution using sed
 7. JSON validation with jq
 8. Permission adjustment for steam user
+9. Startup script generation with logging
+
+#### Installation Logging Levels
+
+The installation script supports two logging levels controlled by the `INSTALL_LOG` variable:
+
+**INFO (Default)** - Essential progress messages only:
+```
+==========================================
+Arma Reforger Server - Installation
+Logging Level: INFO
+==========================================
+[1/6] Checking dependencies...
+[2/6] Configuring installation parameters...
+  -> Using Steam account: myuser
+[3/6] Creating server directories...
+[4/6] Downloading Arma Reforger Server files (App 1874900)...
+  -> Starting SteamCMD download (this may take several minutes)...
+  -> Download completed
+[5/6] Verifying installation...
+  -> ArmaReforgerServer found (156M)
+[6/6] Generating default configuration...
+  -> Validating JSON structure...
+  -> config.json is valid ✓
+  -> Startup script created: startup.sh
+==========================================
+Installation completed successfully!
+==========================================
+Summary:
+  Server Binary: ArmaReforgerServer (156M)
+  Startup Script: startup.sh
+  Config File: config.json (validated)
+  Server Name: My Server
+  Max Players: 128
+  Install Size: 2.1G
+==========================================
+```
+
+**DEBUG** - Verbose output with all commands and details:
+```
+==========================================
+Arma Reforger Server - Installation
+Logging Level: DEBUG
+==========================================
+  [DEBUG] Working directory: /mnt/server
+  [DEBUG] User: root
+  [DEBUG] App ID: 1874900
+[1/6] Checking dependencies...
+  [DEBUG] jq available: /usr/bin/jq
+[2/6] Configuring installation parameters...
+  [DEBUG] Server name: My Server
+  [DEBUG] App ID: 1874900
+  -> Using Steam account: myuser
+[3/6] Creating server directories...
+  [DEBUG] Directories created: profile, tmp
+  [DEBUG] Setting permissions for steam user...
+[4/6] Downloading Arma Reforger Server files (App 1874900)...
+  [DEBUG] Install directory: /mnt/server
+  [DEBUG] Testing network connectivity...
+  [DEBUG] Network connectivity OK (8.8.8.8)
+  [DEBUG] Testing Steam connectivity...
+  [DEBUG] Steam servers reachable
++ su - steam -c '/home/steam/steamcmd/steamcmd.sh +force_install_dir /mnt/server +login...'
+  -> Starting SteamCMD download (this may take several minutes)...
+  [... SteamCMD output ...]
+  -> Download completed
+[5/6] Verifying installation...
+  -> ArmaReforgerServer found (156M)
+[6/6] Generating default configuration...
+  [DEBUG] Configuration template generated
+  [DEBUG] Placeholders replaced with actual values
+  -> Validating JSON structure...
+  -> config.json is valid ✓
+  -> Startup script created: startup.sh
+  [DEBUG] Setting final permissions...
+==========================================
+Installation completed successfully!
+==========================================
+Summary:
+  Server Binary: ArmaReforgerServer (156M)
+  Startup Script: startup.sh
+  Config File: config.json (validated)
+  Server Name: My Server
+  Max Players: 128
+  Install Size: 2.1G
+==========================================
+  [DEBUG] Final directory listing:
+  [... directory contents ...]
+==========================================
+```
+
+**When to use DEBUG mode:**
+- Troubleshooting installation failures
+- Verifying Steam credentials
+- Diagnosing network connectivity issues
+- Understanding exact script execution flow
+- Debugging configuration generation problems
 
 ### Phase 2: Runtime
 
@@ -182,13 +279,25 @@ This error typically indicates an issue with the egg import or Pterodactyl confi
 
 **Debugging Installation Process**
 
-The installation script includes extensive debugging output with `set -x`. Each step shows:
-- Current working directory and user
-- Dependency availability
-- SteamCMD download progress
-- File verification with sizes
-- JSON validation results
-- Directory listings on error
+The installation script includes two logging levels for different troubleshooting needs:
+
+1. **Enable DEBUG mode** for detailed output:
+   - Navigate to server → Startup tab in Pterodactyl Panel
+   - Set `INSTALL_LOG` variable to `DEBUG`
+   - Reinstall server to see verbose output with all commands executed
+   - Shows: Command traces, network tests, file operations, validation details
+
+2. **Use INFO mode** (default) for clean progress messages:
+   - Shows only essential steps and completion status
+   - Ideal for production installations
+   - Reduces log noise while maintaining visibility
+
+Each installation step shows:
+- Phase number and description (1/6, 2/6, etc.)
+- Essential progress indicators
+- Success/failure confirmations
+- Error messages with troubleshooting hints
+- Final summary with server configuration
 
 To view full installation logs:
 1. Navigate to server console in Pterodactyl Panel
