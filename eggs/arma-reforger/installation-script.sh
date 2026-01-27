@@ -5,139 +5,163 @@
 #
 # Server Files: /mnt/server (becomes /home/container at runtime)
 
-# Enable error reporting and command tracing for debugging
+# Enable error reporting
 set -e  # Exit on any error
-set -x  # Print each command before executing (debugging)
 
 ##
 # Variables
 # SRCDS_APPID - 1874900 (Arma Reforger Dedicated Server)
+# INSTALL_LOG - DEBUG or INFO (default: INFO)
 ##
 
-echo "=========================================="
-echo "DEBUG: Installation script started"
-echo "Working directory: $(pwd)"
-echo "User: $(whoami)"
-echo "=========================================="
+# Configure logging level
+INSTALL_LOG="${INSTALL_LOG:-INFO}"
+
+if [ "${INSTALL_LOG}" = "DEBUG" ]; then
+    set -x  # Print each command before executing (verbose mode)
+fi
+
+# Logging functions
+log_info() {
+    echo "$1"
+}
+
+log_debug() {
+    if [ "${INSTALL_LOG}" = "DEBUG" ]; then
+        echo "  [DEBUG] $1"
+    fi
+}
+
+log_step() {
+    echo "[$1] $2"
+}
+
+log_substep() {
+    echo "  -> $1"
+}
+
+log_error() {
+    echo "=========================================="
+    echo "ERROR: $1"
+    echo "=========================================="
+}
+
+log_info "=========================================="
+log_info "Arma Reforger Server - Installation"
+log_info "Logging Level: ${INSTALL_LOG}"
+log_info "=========================================="
+
+log_debug "Working directory: $(pwd)"
+log_debug "User: $(whoami)"
+log_debug "App ID: ${SRCDS_APPID}"
 
 cd /mnt/server
 
-echo "=========================================="
-echo "Arma Reforger Server - Installation"
-echo "=========================================="
-
 ## Check if jq is available (should be in custom Docker image)
-echo "[1/6] Checking dependencies..."
+log_step "1/6" "Checking dependencies..."
 if ! command -v jq &> /dev/null; then
-    echo "  -> jq not found, installing..."
+    log_substep "jq not found, installing..."
     apt-get update > /dev/null 2>&1
     apt-get install -y --no-install-recommends jq > /dev/null 2>&1
-    echo "  -> jq installed successfully"
+    log_substep "jq installed successfully"
 else
-    echo "  -> jq is available: $(which jq)"
+    log_debug "jq available: $(which jq)"
 fi
 
 ## Clean input variables
-echo "[2/6] Configuring installation parameters..."
+log_step "2/6" "Configuring installation parameters..."
 SERVER_NAME="$(echo "$SERVER_NAME" | xargs)"
 RCON_PASSWORD="$(echo "$RCON_PASSWORD" | xargs)"
 ADMIN_PASS="$(echo "$ADMIN_PASS" | xargs)"
-echo "  -> Server name: ${SERVER_NAME}"
-echo "  -> App ID: ${SRCDS_APPID}"
+log_debug "Server name: ${SERVER_NAME}"
+log_debug "App ID: ${SRCDS_APPID}"
 
 ## Set default steam credentials
 if [ -z "${STEAM_USER}" ] || [ -z "${STEAM_PASS}" ]; then
-    echo "  -> Using anonymous Steam login"
+    log_substep "Using anonymous Steam login"
     STEAM_USER=anonymous
     STEAM_PASS=""
     STEAM_AUTH=""
 else
-    echo "  -> Using Steam account: ${STEAM_USER}"
+    log_substep "Using Steam account: ${STEAM_USER}"
 fi
 
 ## Create required directories
-echo "[3/6] Creating server directories..."
+log_step "3/6" "Creating server directories..."
 mkdir -p /mnt/server/profile /mnt/server/tmp
-echo "  -> Directories created: profile, tmp"
-
-## Fix permissions for steam user
-echo "  -> Setting permissions for steam user..."
+log_debug "Directories created: profile, tmp"
+log_debug "Setting permissions for steam user..."
 chown -R steam:steam /mnt/server
 
 ## Install game files via SteamCMD (must run as 'steam' user, not root)
-echo "[4/6] Downloading Arma Reforger Server files..."
-echo "  -> App ID: ${SRCDS_APPID}"
-echo "  -> Install directory: /mnt/server"
+log_step "4/6" "Downloading Arma Reforger Server files (App ${SRCDS_APPID})..."
+log_debug "Install directory: /mnt/server"
 
 ## Test network connectivity before attempting download
-echo "  -> Testing network connectivity..."
+log_debug "Testing network connectivity..."
 if ping -c 1 8.8.8.8 > /dev/null 2>&1; then
-    echo "  -> Network connectivity OK"
+    log_debug "Network connectivity OK (8.8.8.8)"
 elif ping -c 1 1.1.1.1 > /dev/null 2>&1; then
-    echo "  -> Network connectivity OK (using 1.1.1.1)"
+    log_debug "Network connectivity OK (1.1.1.1)"
 else
-    echo "=========================================="
-    echo "ERROR: No network connectivity!"
-    echo "=========================================="
-    echo "The container cannot reach the internet."
-    echo ""
-    echo "Troubleshooting steps:"
-    echo "  1. Check Pterodactyl Wings network configuration"
-    echo "  2. Verify Docker network: docker network ls"
-    echo "  3. Check firewall rules on the host"
-    echo "  4. Test: docker run --rm alpine ping -c 1 8.8.8.8"
-    echo ""
-    echo "Common causes:"
-    echo "  - Wings network_mode misconfiguration"
-    echo "  - Docker bridge network issues"
-    echo "  - Host firewall blocking container traffic"
-    echo "  - DNS resolution problems"
-    echo "=========================================="
+    log_error "No network connectivity!"
+    log_info "The container cannot reach the internet."
+    log_info ""
+    log_info "Troubleshooting steps:"
+    log_info "  1. Check Pterodactyl Wings network configuration"
+    log_info "  2. Verify Docker network: docker network ls"
+    log_info "  3. Check firewall rules on the host"
+    log_info "  4. Test: docker run --rm alpine ping -c 1 8.8.8.8"
+    log_info ""
+    log_info "Common causes:"
+    log_info "  - Wings network_mode misconfiguration"
+    log_info "  - Docker bridge network issues"
+    log_info "  - Host firewall blocking container traffic"
+    log_info "  - DNS resolution problems"
+    log_info "=========================================="
     exit 1
 fi
 
 ## Test Steam connectivity
-echo "  -> Testing Steam connectivity..."
+log_debug "Testing Steam connectivity..."
 if ping -c 1 steamcontent.com > /dev/null 2>&1 || ping -c 1 steamcdn-a.akamaihd.net > /dev/null 2>&1; then
-    echo "  -> Steam servers reachable"
+    log_debug "Steam servers reachable"
 else
-    echo "  -> WARNING: Cannot ping Steam servers (may still work)"
+    log_debug "WARNING: Cannot ping Steam servers (may still work)"
 fi
 
-echo "  -> This may take several minutes depending on your connection..."
-echo "  -> Starting SteamCMD download..."
+log_substep "Starting SteamCMD download (this may take several minutes)..."
 
 su - steam -c "/home/steam/steamcmd/steamcmd.sh +force_install_dir /mnt/server +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} +app_update ${SRCDS_APPID} ${INSTALL_FLAGS} validate +quit"
 
-echo "  -> SteamCMD download completed"
+log_substep "Download completed"
 
 ## Verify installation
-echo "[5/6] Verifying installation..."
-echo "  -> Checking for ArmaReforgerServer executable..."
+log_step "5/6" "Verifying installation..."
 
 if [ ! -f "/mnt/server/ArmaReforgerServer" ]; then
-    echo "=========================================="
-    echo "ERROR: Installation failed!"
-    echo "The ArmaReforgerServer executable was not found."
-    echo "=========================================="
-    echo "DEBUG: Listing /mnt/server contents:"
-    ls -lah /mnt/server/ || echo "Cannot list directory"
-    echo "=========================================="
-    echo "Possible causes:"
-    echo "  - Invalid Steam credentials"
-    echo "  - Network connectivity issues"
-    echo "  - Insufficient disk space"
-    echo "  - Steam service is down"
-    echo "  - Wrong App ID (current: ${SRCDS_APPID})"
-    echo "=========================================="
+    log_error "Installation failed!"
+    log_info "The ArmaReforgerServer executable was not found."
+    log_info "=========================================="
+    if [ "${INSTALL_LOG}" = "DEBUG" ]; then
+        log_info "Directory contents:"
+        ls -lah /mnt/server/ || log_info "Cannot list directory"
+        log_info "=========================================="
+    fi
+    log_info "Possible causes:"
+    log_info "  - Invalid Steam credentials"
+    log_info "  - Network connectivity issues"
+    log_info "  - Insufficient disk space"
+    log_info "  - Steam service is down"
+    log_info "  - Wrong App ID (current: ${SRCDS_APPID})"
+    log_info "=========================================="
     exit 1
 fi
 
-echo "  -> ArmaReforgerServer found!"
-echo "  -> File size: $(du -h /mnt/server/ArmaReforgerServer | cut -f1)"
+log_substep "ArmaReforgerServer found ($(du -h /mnt/server/ArmaReforgerServer | cut -f1))"
 
 ## Generate initial config.json
-echo "[6/6] Generating default configuration..."
+log_step "6/6" "Generating default configuration..."
 cat > /mnt/server/config.json << 'EOFCONFIG'
 {
 	"publicAddress": "SERVER_IP_PLACEHOLDER",
@@ -226,24 +250,25 @@ sed -i "s/QUEUE_MAX_SIZE_PLACEHOLDER/${QUEUE_MAX_SIZE}/g" /mnt/server/config.jso
 sed -i "s/PLAYER_SAVE_TIME_PLACEHOLDER/${PLAYER_SAVE_TIME}/g" /mnt/server/config.json
 sed -i "s/SLOT_RESERVATION_TIMEOUT_PLACEHOLDER/${SLOT_RESERVATION_TIMEOUT}/g" /mnt/server/config.json
 
-echo "  -> Configuration template generated"
-echo "  -> Placeholders replaced with actual values"
+log_debug "Configuration template generated"
+log_debug "Placeholders replaced with actual values"
 
 ## Validate generated config.json
-echo "  -> Validating JSON structure..."
+log_substep "Validating JSON structure..."
 if jq empty /mnt/server/config.json 2>/dev/null; then
-    echo "  -> config.json is valid JSON ✓"
+    log_substep "config.json is valid ✓"
 else
-    echo "=========================================="
-    echo "ERROR: config.json validation failed!"
-    echo "The generated configuration contains invalid JSON."
-    echo "=========================================="
-    echo "DEBUG: config.json content:"
-    cat /mnt/server/config.json || echo "Cannot read config.json"
-    echo "=========================================="
-    echo "Debugging info:"
-    jq empty /mnt/server/config.json 2>&1
-    echo "=========================================="
+    log_error "config.json validation failed!"
+    log_info "The generated configuration contains invalid JSON."
+    log_info "=========================================="
+    if [ "${INSTALL_LOG}" = "DEBUG" ]; then
+        log_info "config.json content:"
+        cat /mnt/server/config.json || log_info "Cannot read config.json"
+        log_info "=========================================="
+        log_info "Validation errors:"
+        jq empty /mnt/server/config.json 2>&1
+    fi
+    log_info "=========================================="
     exit 1
 fi
 
@@ -324,22 +349,26 @@ exec ./ArmaReforgerServer \
 EOFSTARTUP
 
 chmod +x /mnt/server/startup.sh
-echo "  -> Startup script created: startup.sh"
+log_substep "Startup script created: startup.sh"
 
 ## Fix permissions one more time
-echo "  -> Setting final permissions..."
+log_debug "Setting final permissions..."
 chown -R steam:steam /mnt/server
 
-echo "=========================================="
-echo "Installation completed successfully!"
-echo "=========================================="
-echo "Summary:"
-echo "  -> Server binary: /mnt/server/ArmaReforgerServer"
-echo "  -> Startup script: /mnt/server/startup.sh"
-echo "  -> Config file: /mnt/server/config.json (validated)"
-echo "  -> Profile directory: /mnt/server/profile"
-echo "  -> Installation directory size: $(du -sh /mnt/server | cut -f1)"
-echo "=========================================="
-echo "DEBUG: Final directory listing:"
-ls -lah /mnt/server/ | head -20
-echo "========================================="
+log_info "=========================================="
+log_info "Installation completed successfully!"
+log_info "=========================================="
+log_info "Summary:"
+log_info "  Server Binary: ArmaReforgerServer ($(du -h /mnt/server/ArmaReforgerServer | cut -f1))"
+log_info "  Startup Script: startup.sh"
+log_info "  Config File: config.json (validated)"
+log_info "  Server Name: ${SERVER_NAME}"
+log_info "  Max Players: ${MAX_PLAYERS}"
+log_info "  Install Size: $(du -sh /mnt/server 2>/dev/null | cut -f1 || echo 'N/A')"
+log_info "=========================================="
+
+if [ "${INSTALL_LOG}" = "DEBUG" ]; then
+    log_debug "Final directory listing:"
+    ls -lah /mnt/server/ | head -20
+    log_debug "========================================="
+fi
