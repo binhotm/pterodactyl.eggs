@@ -1,55 +1,64 @@
-# Pterodactyl Eggs by SAS BR
+# Pterodactyl Eggs
 
 ![License](https://img.shields.io/github/license/SEU_USUARIO/pterodactyl.eggs)
 ![Pterodactyl](https://img.shields.io/badge/Pterodactyl-v1.0+-blue)
 
-This repository contains high-performance, validated Eggs for [Pterodactyl Panel](https://pterodactyl.io).
+Production-ready Pterodactyl Panel eggs for game server deployment. This repository provides validated, enterprise-grade server configurations with enhanced reliability features.
 
-Created to solve the scarcity of reliable, production-ready configurations for specific games, starting with **Arma Reforger**.
+## Available Server Eggs
 
-## 🚀 Available Eggs
-
-| Game | Engine | Status | Highlights |
+| Game | Engine | Status | Key Features |
 | :--- | :--- | :--- | :--- |
-| **Arma Reforger** | Enfusion | ✅ Stable | JSON validation (`jq`), Auto-config, Optimized Install |
+| Arma Reforger | Enfusion | Stable | JSON validation, automated configuration, optimized installation |
+
+## Arma Reforger Server
+
+Location: [`/eggs/arma-reforger/`](./eggs/arma-reforger/)
+
+This egg includes several improvements over standard configurations:
+
+**Configuration Management**
+- JSON validation using `jq` prevents malformed configurations and crash loops
+- Idempotent configuration regeneration ensures consistency across reinstalls
+- Panel serves as single source of truth for all server settings
+
+**Installation Process**
+- Custom Docker image with pre-installed dependencies (`jq`, `curl`, 32-bit libraries)
+- Dual-container strategy: root privileges for installation, unprivileged runtime
+- Automated validation at every step
+
+**Platform Support**
+- Native crossplay configuration for PC, Xbox, and PlayStation platforms
+- A2S query support for server browser integration
+- RCON remote administration capability
+
+### Installation Instructions
+
+1. Download `egg-pterodactyl-arma-reforger.json` from the repository
+2. Navigate to Pterodactyl Panel Admin area
+3. Select Nests, then Import Egg
+4. Upload the JSON file and configure nest settings
+5. Create new server instance using the imported egg
+
+### System Requirements
+
+- Docker image: `fabriciojrsilva/steamcmd-eggs:installer` (installation) / `cm2network/steamcmd:latest` (runtime)
+- Minimum RAM: 4GB recommended for stable operation
+- Network: Ports configurable via panel (default: game 2001, A2S 17777, RCON 19998)
+
+## Contributing
+
+Contributions are accepted for script improvements, new configuration variables, and additional game server eggs.
+
+Standard workflow:
+1. Fork the repository
+2. Create feature branch
+3. Submit pull request with detailed description
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for complete terms.
 
 ---
 
-## 🛠️ Arma Reforger Egg
-
-Located in: [`/arma-reforger/`](./arma-reforger/)
-
-This is not just a copy-paste of the default egg. It includes several engineering improvements for stability and data integrity.
-
-### Key Features
-* **Safety First:** Implements `jq` to validate the generated `config.json` before starting the server. If the JSON is invalid, the server won't start, preventing crash loops.
-* **Hybrid Installation:** Uses `cm2network/steamcmd:root` for installation (ensuring dependencies like `jq` and `curl` are present) and drops privileges correctly for runtime.
-* **Idempotent Configuration:** The `config.json` is regenerated on every install/reinstall based on environment variables, ensuring the Panel is always the Single Source of Truth.
-* **Crossplay Ready:** Native support for Xbox/PSN crossplay configuration variables.
-
-### Installation
-1.  Download the `egg-pterodactyl-arma-reforger.json` file.
-2.  Go to your Pterodactyl Panel > **Nests** > **Import Egg**.
-3.  Select the file and import it into the desired Nest.
-4.  Create a new server using this Egg.
-
-### Requirements
-* **Docker Images:** Utilizes `cm2network/steamcmd` (standard) or compatible custom images.
-* **Resources:** Recommended minimum of 4GB RAM for a stable Reforger instance.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! If you have improvements for the install scripts or new variables:
-1.  Fork this repository.
-2.  Create a branch (`feature/new-variable`).
-3.  Commit your changes.
-4.  Open a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-*Maintained by Fabricio Junior (BinhoTM)*
+Maintained by Fabricio Junior

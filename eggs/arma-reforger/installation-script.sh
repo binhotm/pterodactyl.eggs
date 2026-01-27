@@ -72,8 +72,6 @@ fi
 echo "[5/6] Generating default configuration..."
 cat > /mnt/server/config.json << 'EOFCONFIG'
 {
-	"bindAddress": "0.0.0.0",
-	"bindPort": SERVER_PORT_PLACEHOLDER,
 	"publicAddress": "SERVER_IP_PLACEHOLDER",
 	"publicPort": SERVER_PORT_PLACEHOLDER,
 	"a2s": {
@@ -128,8 +126,8 @@ cat > /mnt/server/config.json << 'EOFCONFIG'
 EOFCONFIG
 
 ## Replace placeholders with actual values using sed
-sed -i "s/SERVER_PORT_PLACEHOLDER/${SERVER_PORT}/g" /mnt/server/config.json
 sed -i "s/SERVER_IP_PLACEHOLDER/${SERVER_IP}/g" /mnt/server/config.json
+sed -i "s/SERVER_PORT_PLACEHOLDER/${SERVER_PORT}/g" /mnt/server/config.json
 sed -i "s/A2S_ADDRESS_PLACEHOLDER/${A2S_ADDRESS}/g" /mnt/server/config.json
 sed -i "s/A2S_PORT_PLACEHOLDER/${A2S_PORT}/g" /mnt/server/config.json
 sed -i "s/RCON_ADDRESS_PLACEHOLDER/${RCON_ADDRESS}/g" /mnt/server/config.json
