@@ -1,73 +1,78 @@
 # Arma Reforger - Pterodactyl Egg
 
-Egg otimizado para Arma Reforger Dedicated Server no Pterodactyl Panel.
+Production-ready egg for Arma Reforger Dedicated Server on Pterodactyl Panel.
 
-## 🎯 Fluxo de Instalação e Execução
+## Installation and Execution
 
-### **Fase 1: Instalação** (Container: `pterodactyl-arma-reforger:latest` ou `cm2network/steamcmd:root`)
+### Phase 1: Installation
 
-1. ✅ **Verificar dependências** - jq para validação JSON (instalado no Docker customizado)
-2. ✅ **Configurar credenciais Steam** - Anonymous ou autenticado
-3. ✅ **Criar diretórios** - profile/, tmp/
-4. ✅ **Download via SteamCMD** - App ID 1874900 (Arma Reforger)
-5. ✅ **Gerar config.json** - Template com placeholders
-6. ✅ **Substituir variáveis** - sed replacement de todos os placeholders
-7. ✅ **Validar JSON** - jq valida a configuração antes de prosseguir
-8. ✅ **Fix permissions** - chown para usuário steam
+Container: `fabriciojrsilva/steamcmd-eggs:installer`
 
-**Resultado**: Server instalado + config.json validado e pronto
+The installation process performs the following operations:
 
-### **Fase 2: Execução** (Container: `cm2network/steamcmd:latest`)
+1. Dependency verification (jq for JSON validation)
+2. Steam credentials configuration (anonymous or authenticated)
+3. Directory structure creation (profile/, tmp/)
+4. Server files download via SteamCMD (App ID 1874900)
+5. Configuration file generation from template
+6. Variable substitution using sed
+7. JSON validation with jq
+8. Permission adjustment for steam user
 
-1. ✅ **Converter booleans** - sed converte `"true"` → `true` no JSON
-2. ✅ **Iniciar servidor** - `./ArmaReforgerServer -config config.json -profile profile ...`
+### Phase 2: Runtime
 
-**Startup command**:
+Container: `cm2network/steamcmd:latest`
+
+The server startup performs boolean conversion and launches the Arma Reforger server binary.
+
+Startup command:
 ```bash
 sed -i 's/"true"/true/g; s/"false"/false/g' config.json; ./ArmaReforgerServer -config ./config.json -profile ./profile -listScenarios -logStats $(({{LOG_INTERVAL}}*1000)) -maxFPS {{MAX_FPS}} -rpl-timeout-ms 30000
 ```
 
-## 📦 Docker Image Customizada
+## Custom Docker Image
 
-**Arquivo**: `../docker/arma-reforger/Dockerfile`
+Location: `../docker/arma-reforger/Dockerfile`
 
-**Benefícios**:
-- jq pré-instalado (validação JSON)
-- curl, ca-certificates (download de mods)
-- lib32gcc-s1, lib32stdc++6 (compatibilidade 32-bit)
-- iputils-ping (diagnóstico de rede)
+Includes pre-installed dependencies:
+- jq (JSON validation)
+- curl, ca-certificates (mod downloads)
+- lib32gcc-s1, lib32stdc++6 (32-bit compatibility)
+- iputils-ping (network diagnostics)
 
-**Build**:
+Build and publish:
 ```bash
 cd docker/arma-reforger
-docker build -t pterodactyl-arma-reforger:latest .
+docker build -t fabriciojrsilva/steamcmd-eggs:installer .
+docker push fabriciojrsilva/steamcmd-eggs:installer
 ```
 
-## 🔧 Desenvolvimento
+## Development Workflow
 
-### Modificar Installation Script
+### Modifying the Installation Script
 
-1. Editar `installation-script.sh` (formato legível)
-2. Sincronizar com o JSON:
+1. Edit `installation-script.sh` directly
+2. Synchronize changes to egg JSON:
    ```bash
    python sync-script-to-json.py
    ```
-3. Validar:
+3. Validate JSON structure:
    ```bash
    python -c "import json; json.load(open('egg-pterodactyl-arma-reforger.json'))"
    ```
 
-### Adicionar Novas Variáveis
+### Adding Configuration Variables
 
-Ver instruções em `.github/copilot-instructions.md`
+Refer to `.github/copilot-instructions.md` for detailed instructions.
 
-## ❌ Arquivos NÃO Utilizados
+## Deprecated Files
 
-- **`docker/arma-reforger/entrypoint.sh`**: Não é usado pelo Pterodactyl (o egg JSON controla o entrypoint)
+The following files are not used by Pterodactyl:
+- `docker/arma-reforger/entrypoint.sh` - Egg JSON controls the entrypoint directly
 
-## 📝 Notas Importantes
+## Technical Notes
 
-- ✅ Pterodactyl Panel é a **única fonte de verdade** para configurações
-- ✅ config.json é **regenerado** a cada instalação (idempotência)
-- ✅ Validação jq **previne crash loops** por JSON inválido
-- ✅ Booleans são strings nas env vars, convertidos no startup
+- Pterodactyl Panel serves as the single source of truth for all server configurations
+- Configuration file is regenerated on every installation to ensure consistency
+- JSON validation prevents server crash loops from malformed configuration
+- Boolean environment variables are converted from strings at startup
