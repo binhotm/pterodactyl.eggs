@@ -32,6 +32,16 @@
         }
     },
     "variables": [
+         {
+            "name": "[Advanced] Installation Log Level",
+            "description": "Controls verbosity of installation logs. DEBUG: Shows all commands and detailed output. INFO: Shows only essential progress messages.",
+            "env_variable": "INSTALL_LOG",
+            "default_value": "INFO",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:DEBUG,INFO",
+            "field_type": "text"
+        },
         {
             "name": "[Network] A2S Address",
             "description": "Steam Query (A2S) bind address. Use 0.0.0.0 for all interfaces.",
@@ -451,17 +461,7 @@
             "user_editable": true,
             "rules": "required|integer|between:1,100",
             "field_type": "text"
-        },
-        {
-            "name": "[Advanced] Installation Log Level",
-            "description": "Controls verbosity of installation logs. DEBUG: Shows all commands and detailed output. INFO: Shows only essential progress messages.",
-            "env_variable": "INSTALL_LOG",
-            "default_value": "INFO",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|string|in:DEBUG,INFO",
-            "field_type": "text"
-        },
+        },       
         {
             "name": "[Repair] Validate Server Files",
             "description": "\"true\" to enable; empty to disable. Validates all server files when Automatic Updates is enabled. Note: This will significantly increase server startup times, so it is recommended to only enable this when needed.",
