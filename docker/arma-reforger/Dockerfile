@@ -20,8 +20,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Volta para o usuário steam para segurança
-USER steam
+# Mantém usuário root para instalação (Pterodactyl gerencia segurança em runtime)
+# O script de instalação precisa de root para apt-get, chown, etc.
+USER root
 
-# Define o Entrypoint padrão (opcional, pode manter o da base)
+# Define o Entrypoint padrão
 WORKDIR /home/steam/steamcmd
