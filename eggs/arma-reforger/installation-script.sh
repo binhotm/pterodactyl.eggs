@@ -90,7 +90,7 @@ cat > /mnt/server/config.json << 'EOFCONFIG'
 		"name": "SERVER_NAME_PLACEHOLDER",
 		"password": "SERVER_PASS_PLACEHOLDER",
 		"passwordAdmin": "ADMIN_PASS_PLACEHOLDER",
-		"admins": [],
+		"admins": ADMINS_JSON_PLACEHOLDER,
 		"scenarioId": "SCENARIO_ID_PLACEHOLDER",
 		"maxPlayers": MAX_PLAYERS_PLACEHOLDER,
 		"visible": VISIBLE_PLACEHOLDER,
@@ -138,6 +138,7 @@ sed -i "s/RCON_PASSWORD_PLACEHOLDER/${RCON_PASSWORD}/g" /mnt/server/config.json
 sed -i "s/SERVER_NAME_PLACEHOLDER/${SERVER_NAME}/g" /mnt/server/config.json
 sed -i "s/SERVER_PASS_PLACEHOLDER/${SERVER_PASS}/g" /mnt/server/config.json
 sed -i "s/ADMIN_PASS_PLACEHOLDER/${ADMIN_PASS}/g" /mnt/server/config.json
+sed -i "s/ADMINS_JSON_PLACEHOLDER/${ADMINS_JSON}/g" /mnt/server/config.json
 sed -i "s|SCENARIO_ID_PLACEHOLDER|${SCENARIO_ID}|g" /mnt/server/config.json
 sed -i "s/MAX_PLAYERS_PLACEHOLDER/${MAX_PLAYERS}/g" /mnt/server/config.json
 sed -i "s/VISIBLE_PLACEHOLDER/${VISIBLE}/g" /mnt/server/config.json
