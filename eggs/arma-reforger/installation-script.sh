@@ -160,98 +160,67 @@ fi
 
 log_substep "ArmaReforgerServer found ($(du -h /mnt/server/ArmaReforgerServer | cut -f1))"
 
-## Generate initial config.json
-log_step "6/6" "Generating default configuration..."
+## Generate minimal config.json template (Pterodactyl will populate via config.files parser)
+log_step "6/6" "Generating configuration template..."
 cat > /mnt/server/config.json << 'EOFCONFIG'
 {
-	"publicAddress": "SERVER_IP_PLACEHOLDER",
-	"publicPort": SERVER_PORT_PLACEHOLDER,
+	"bindAddress": "0.0.0.0",
+	"bindPort": 2001,
+	"publicAddress": "0.0.0.0",
+	"publicPort": 2001,
 	"a2s": {
-		"address": "A2S_ADDRESS_PLACEHOLDER",
-		"port": A2S_PORT_PLACEHOLDER
+		"address": "0.0.0.0",
+		"port": 17777
 	},
 	"rcon": {
-		"address": "RCON_ADDRESS_PLACEHOLDER",
-		"port": RCON_PORT_PLACEHOLDER,
-		"password": "RCON_PASSWORD_PLACEHOLDER",
+		"address": "0.0.0.0",
+		"port": 19998,
+		"password": "changeme",
 		"permission": "admin"
 	},
 	"game": {
-		"name": "SERVER_NAME_PLACEHOLDER",
-		"password": "SERVER_PASS_PLACEHOLDER",
-		"passwordAdmin": "ADMIN_PASS_PLACEHOLDER",
-		"admins": ADMINS_JSON_PLACEHOLDER,
-		"scenarioId": "SCENARIO_ID_PLACEHOLDER",
-		"maxPlayers": MAX_PLAYERS_PLACEHOLDER,
-		"visible": VISIBLE_PLACEHOLDER,
-		"crossPlatform": CROSS_PLATFORM_PLACEHOLDER,
+		"name": "Arma Reforger Server",
+		"password": "",
+		"passwordAdmin": "changeme",
+		"admins": [],
+		"scenarioId": "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
+		"maxPlayers": 64,
+		"visible": true,
+		"crossPlatform": true,
 		"supportedPlatforms": ["PLATFORM_PC", "PLATFORM_XBL", "PLATFORM_PSN"],
 		"gameProperties": {
-			"serverMaxViewDistance": MAX_VIEW_DISTANCE_PLACEHOLDER,
-			"serverMinGrassDistance": MIN_GRASS_DISTANCE_PLACEHOLDER,
-			"networkViewDistance": NETWORK_VIEW_DISTANCE_PLACEHOLDER,
-			"disableThirdPerson": DISABLE_THIRD_PLACEHOLDER,
+			"serverMaxViewDistance": 5000,
+			"serverMinGrassDistance": 50,
+			"networkViewDistance": 1500,
+			"disableThirdPerson": false,
 			"fastValidation": true,
-			"battlEye": BATTLEYE_PLACEHOLDER,
-			"VONDisableUI": VON_DISABLE_UI_PLACEHOLDER,
-			"VONDisableDirectSpeechUI": VON_DISABLE_DIRECT_UI_PLACEHOLDER,
-			"VONCanTransmitCrossFaction": VON_CROSS_FACTION_PLACEHOLDER,
+			"battlEye": false,
+			"VONDisableUI": false,
+			"VONDisableDirectSpeechUI": false,
+			"VONCanTransmitCrossFaction": false,
 			"missionHeader": {}
 		},
-		"modsRequiredByDefault": MODS_REQUIRED_PLACEHOLDER,
-		"mods": MODS_JSON_PLACEHOLDER
+		"modsRequiredByDefault": false,
+		"mods": []
 	},
 	"operating": {
-		"aiLimit": AI_LIMIT_PLACEHOLDER,
-		"disableAI": DISABLE_AI_PLACEHOLDER,
+		"aiLimit": -1,
+		"disableAI": false,
 		"disableCrashReporter": false,
 		"disableNavmeshStreaming": [],
-		"disableServerShutdown": DISABLE_SHUTDOWN_PLACEHOLDER,
+		"disableServerShutdown": true,
 		"joinQueue": {
-			"maxSize": QUEUE_MAX_SIZE_PLACEHOLDER
+			"maxSize": 30
 		},
 		"lobbyPlayerSynchronise": true,
-		"playerSaveTime": PLAYER_SAVE_TIME_PLACEHOLDER,
-		"slotReservationTimeout": SLOT_RESERVATION_TIMEOUT_PLACEHOLDER
+		"playerSaveTime": 120,
+		"slotReservationTimeout": 60
 	}
 }
 EOFCONFIG
 
-## Replace placeholders with actual values using sed
-sed -i "s/SERVER_IP_PLACEHOLDER/${SERVER_IP}/g" /mnt/server/config.json
-sed -i "s/SERVER_PORT_PLACEHOLDER/${SERVER_PORT}/g" /mnt/server/config.json
-sed -i "s/A2S_ADDRESS_PLACEHOLDER/${A2S_ADDRESS}/g" /mnt/server/config.json
-sed -i "s/A2S_PORT_PLACEHOLDER/${A2S_PORT}/g" /mnt/server/config.json
-sed -i "s/RCON_ADDRESS_PLACEHOLDER/${RCON_ADDRESS}/g" /mnt/server/config.json
-sed -i "s/RCON_PORT_PLACEHOLDER/${RCON_PORT}/g" /mnt/server/config.json
-sed -i "s/RCON_PASSWORD_PLACEHOLDER/${RCON_PASSWORD}/g" /mnt/server/config.json
-sed -i "s/SERVER_NAME_PLACEHOLDER/${SERVER_NAME}/g" /mnt/server/config.json
-sed -i "s/SERVER_PASS_PLACEHOLDER/${SERVER_PASS}/g" /mnt/server/config.json
-sed -i "s/ADMIN_PASS_PLACEHOLDER/${ADMIN_PASS}/g" /mnt/server/config.json
-sed -i "s/ADMINS_JSON_PLACEHOLDER/${ADMINS_JSON}/g" /mnt/server/config.json
-sed -i "s|SCENARIO_ID_PLACEHOLDER|${SCENARIO_ID}|g" /mnt/server/config.json
-sed -i "s/MAX_PLAYERS_PLACEHOLDER/${MAX_PLAYERS}/g" /mnt/server/config.json
-sed -i "s/VISIBLE_PLACEHOLDER/${VISIBLE}/g" /mnt/server/config.json
-sed -i "s/CROSS_PLATFORM_PLACEHOLDER/${CROSS_PLATFORM}/g" /mnt/server/config.json
-sed -i "s/MAX_VIEW_DISTANCE_PLACEHOLDER/${MAX_VIEW_DISTANCE}/g" /mnt/server/config.json
-sed -i "s/MIN_GRASS_DISTANCE_PLACEHOLDER/${MIN_GRASS_DISTANCE}/g" /mnt/server/config.json
-sed -i "s/NETWORK_VIEW_DISTANCE_PLACEHOLDER/${NETWORK_VIEW_DISTANCE}/g" /mnt/server/config.json
-sed -i "s/DISABLE_THIRD_PLACEHOLDER/${DISABLE_THIRD}/g" /mnt/server/config.json
-sed -i "s/BATTLEYE_PLACEHOLDER/${BATTLEYE}/g" /mnt/server/config.json
-sed -i "s/VON_DISABLE_UI_PLACEHOLDER/${VON_DISABLE_UI}/g" /mnt/server/config.json
-sed -i "s/VON_DISABLE_DIRECT_UI_PLACEHOLDER/${VON_DISABLE_DIRECT_UI}/g" /mnt/server/config.json
-sed -i "s/VON_CROSS_FACTION_PLACEHOLDER/${VON_CROSS_FACTION}/g" /mnt/server/config.json
-sed -i "s/MODS_REQUIRED_PLACEHOLDER/${MODS_REQUIRED}/g" /mnt/server/config.json
-sed -i "s/MODS_JSON_PLACEHOLDER/${MODS_JSON}/g" /mnt/server/config.json
-sed -i "s/AI_LIMIT_PLACEHOLDER/${AI_LIMIT}/g" /mnt/server/config.json
-sed -i "s/DISABLE_AI_PLACEHOLDER/${DISABLE_AI}/g" /mnt/server/config.json
-sed -i "s/DISABLE_SHUTDOWN_PLACEHOLDER/${DISABLE_SHUTDOWN}/g" /mnt/server/config.json
-sed -i "s/QUEUE_MAX_SIZE_PLACEHOLDER/${QUEUE_MAX_SIZE}/g" /mnt/server/config.json
-sed -i "s/PLAYER_SAVE_TIME_PLACEHOLDER/${PLAYER_SAVE_TIME}/g" /mnt/server/config.json
-sed -i "s/SLOT_RESERVATION_TIMEOUT_PLACEHOLDER/${SLOT_RESERVATION_TIMEOUT}/g" /mnt/server/config.json
-
-log_debug "Configuration template generated"
-log_debug "Placeholders replaced with actual values"
+log_substep "Configuration template created (will be populated by panel)"
+log_debug "Panel will update config.json via config.files parser on server start"
 
 ## Validate generated config.json
 log_substep "Validating JSON structure..."
@@ -334,9 +303,7 @@ echo ""
 # Start the Arma Reforger server with all parameters
 exec ./ArmaReforgerServer \
     -bindIP "${SERVER_IP:-0.0.0.0}" \
-    -bindPort "${SERVER_PORT:-2001}" \
-    -config ./config.json \
-    -profile ./profile \
+    -bindPort "${SERVER_PORT:-2001}" \    
     -logStats $((${LOG_INTERVAL}*1000)) \
     -maxFPS ${MAX_FPS} \
     -rpl-timeout-ms ${RPL_TIMEOUT} \
@@ -346,6 +313,8 @@ exec ./ArmaReforgerServer \
     -streamingBudget ${STREAMING_BUDGET} \
     -streamsDelta ${STREAMS_DELTA} \
     -keepNumOfLogs ${KEEP_NUM_LOGS}
+    -config ./config.json \
+    -profile ./profile \
 EOFSTARTUP
 
 chmod +x /mnt/server/startup.sh
