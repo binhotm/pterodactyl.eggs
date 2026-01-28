@@ -7,7 +7,7 @@
     "exported_at": "2026-01-24T00:00:00+00:00",
     "name": "Arma Reforger",
     "author": "fabriciojuniorsilva@gmail.com",
-    "description": "Experience authentic Cold War combat and join friends in the struggle for a sprawling, 51 km² mid-Atlantic island — or take on the role of Game Master and create your very own scenarios for others to enjoy. Enhanced with A2S, RCON, Crossplay, and advanced operational settings.",
+    "description": "Experience authentic Cold War combat and join friends in the struggle for a sprawling, 51 kmÂ² mid-Atlantic island â€” or take on the role of Game Master and create your very own scenarios for others to enjoy. Enhanced with A2S, RCON, Crossplay, and advanced operational settings.",
     "tags": [],
     "features": [
         "steam_disk_space",
@@ -19,42 +19,64 @@
     "file_denylist": [],
     "startup": "bash startup.sh",
     "config": {
-        "files": "{\n    \"config.json\": {\n        \"parser\": \"json\",\n        \"find\": {\n            \"publicAddress\": \"{{server.build.default.ip}}\",\n            \"publicPort\": \"{{server.build.default.port}}\",\n            \"a2s.address\": \"{{server.build.env.A2S_ADDRESS}}\",\n            \"a2s.port\": \"{{server.build.env.A2S_PORT}}\",\n            \"rcon.address\": \"{{server.build.env.RCON_ADDRESS}}\",\n            \"rcon.port\": \"{{server.build.env.RCON_PORT}}\",\n            \"rcon.password\": \"{{server.build.env.RCON_PASSWORD}}\",\n            \"rcon.permission\": \"admin\",\n            \"game.name\": \"{{server.build.env.SERVER_NAME}}\",\n            \"game.password\": \"{{server.build.env.SERVER_PASS}}\",\n            \"game.passwordAdmin\": \"{{server.build.env.ADMIN_PASS}}\",\n            \"game.admins\": \"{{server.build.env.ADMINS_JSON}}\",\n            \"game.scenarioId\": \"{{server.build.env.SCENARIO_ID}}\",\n            \"game.maxPlayers\": \"{{server.build.env.MAX_PLAYERS}}\",\n            \"game.visible\": \"{{server.build.env.VISIBLE}}\",\n            \"game.crossPlatform\": \"{{server.build.env.CROSS_PLATFORM}}\",\n            \"game.modsRequiredByDefault\": \"{{server.build.env.MODS_REQUIRED}}\",\n            \"game.gameProperties.serverMaxViewDistance\": \"{{server.build.env.MAX_VIEW_DISTANCE}}\",\n            \"game.gameProperties.serverMinGrassDistance\": \"{{server.build.env.MIN_GRASS_DISTANCE}}\",\n            \"game.gameProperties.networkViewDistance\": \"{{server.build.env.NETWORK_VIEW_DISTANCE}}\",\n            \"game.gameProperties.disableThirdPerson\": \"{{server.build.env.DISABLE_THIRD}}\",\n            \"game.gameProperties.fastValidation\": true,\n            \"game.gameProperties.battlEye\": \"{{server.build.env.BATTLEYE}}\",\n            \"game.gameProperties.VONDisableUI\": \"{{server.build.env.VON_DISABLE_UI}}\",\n            \"game.gameProperties.VONDisableDirectSpeechUI\": \"{{server.build.env.VON_DISABLE_DIRECT_UI}}\",\n            \"game.gameProperties.VONCanTransmitCrossFaction\": \"{{server.build.env.VON_CROSS_FACTION}}\",\n            \"operating.aiLimit\": \"{{server.build.env.AI_LIMIT}}\",\n            \"operating.disableAI\": \"{{server.build.env.DISABLE_AI}}\",\n            \"operating.disableServerShutdown\": \"{{server.build.env.DISABLE_SHUTDOWN}}\",\n            \"operating.joinQueue.maxSize\": \"{{server.build.env.QUEUE_MAX_SIZE}}\",\n            \"operating.playerSaveTime\": \"{{server.build.env.PLAYER_SAVE_TIME}}\",\n            \"operating.slotReservationTimeout\": \"{{server.build.env.SLOT_RESERVATION_TIMEOUT}}\"\n        }\n    }\n}",
+        "files": "{\n    \"config.json\": {\n        \"parser\": \"json\",\n        \"find\": {\n            \"bindAddress\": \"0.0.0.0\",\n            \"bindPort\": \"{{server.build.default.port}}\",\n            \"publicAddress\": \"{{env.SERVER_IP}}\",\n            \"publicPort\": \"{{server.build.default.port}}\",\n            \"a2s.address\": \"{{env.A2S_ADDRESS}}\",\n            \"a2s.port\": \"{{env.A2S_PORT}}\",\n            \"rcon.address\": \"{{env.RCON_ADDRESS}}\",\n            \"rcon.port\": \"{{env.RCON_PORT}}\",\n            \"rcon.password\": \"{{env.RCON_PASSWORD}}\",\n            \"game.name\": \"{{env.SERVER_NAME}}\",\n            \"game.password\": \"{{env.SERVER_PASS}}\",\n            \"game.passwordAdmin\": \"{{env.ADMIN_PASS}}\",\n            \"game.scenarioId\": \"{{env.SCENARIO_ID}}\",\n            \"game.maxPlayers\": \"{{env.MAX_PLAYERS}}\",\n            \"game.visible\": \"{{env.VISIBLE}}\",\n            \"game.crossPlatform\": \"{{env.CROSS_PLATFORM}}\",\n            \"game.gameProperties.serverMaxViewDistance\": \"{{env.MAX_VIEW_DISTANCE}}\",\n            \"game.gameProperties.serverMinGrassDistance\": \"{{env.MIN_GRASS_DISTANCE}}\",\n            \"game.gameProperties.networkViewDistance\": \"{{env.NETWORK_VIEW_DISTANCE}}\",\n            \"game.gameProperties.disableThirdPerson\": \"{{env.DISABLE_THIRD}}\",\n            \"game.gameProperties.battlEye\": \"{{env.BATTLEYE}}\",\n            \"game.gameProperties.VONDisableUI\": \"{{env.VON_DISABLE_UI}}\",\n            \"game.gameProperties.VONDisableDirectSpeechUI\": \"{{env.VON_DISABLE_DIRECT_UI}}\",\n            \"game.gameProperties.VONCanTransmitCrossFaction\": \"{{env.VON_CROSS_FACTION}}\",\n            \"game.modsRequiredByDefault\": \"{{env.MODS_REQUIRED}}\",\n            \"operating.aiLimit\": \"{{env.AI_LIMIT}}\",\n            \"operating.disableAI\": \"{{env.DISABLE_AI}}\",\n            \"operating.disableServerShutdown\": \"{{env.DISABLE_SHUTDOWN}}\",\n            \"operating.joinQueue.maxSize\": \"{{env.QUEUE_MAX_SIZE}}\",\n            \"operating.playerSaveTime\": \"{{env.PLAYER_SAVE_TIME}}\",\n            \"operating.slotReservationTimeout\": \"{{env.SLOT_RESERVATION_TIMEOUT}}\"\n        }\n    }\n}",
         "startup": "{\n    \"done\": \"Starting RPL server\"\n}",
-        "logs": "{\n    \"custom\": true,\n    \"location\": \"profile/console*.log\"\n}",
+        "logs": "{}",
         "stop": "^C"
     },
     "scripts": {
         "installation": {
-            "script": "#!/bin/bash\r\n# Arma Reforger Installation Script\r\n# Container: cm2network/steamcmd:root (runs as ROOT during install)\r\n# Runtime: cm2network/steamcmd:latest (runs as non-root)\r\n#\r\n# Server Files: /mnt/server (becomes /home/container at runtime)\r\n\r\n# Enable error reporting\r\nset -e  # Exit on any error\r\n\r\n##\r\n# Variables\r\n# SRCDS_APPID - 1874900 (Arma Reforger Dedicated Server)\r\n# INSTALL_LOG - DEBUG or INFO (default: INFO)\r\n##\r\n\r\n# Configure logging level\r\nINSTALL_LOG=\"${INSTALL_LOG:-INFO}\"\r\n\r\nif [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n    set -x  # Print each command before executing (verbose mode)\r\nfi\r\n\r\n# Logging functions\r\nlog_info() {\r\n    echo \"$1\"\r\n}\r\n\r\nlog_debug() {\r\n    if [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n        echo \"  [DEBUG] $1\"\r\n    fi\r\n}\r\n\r\nlog_step() {\r\n    echo \"[$1] $2\"\r\n}\r\n\r\nlog_substep() {\r\n    echo \"  -> $1\"\r\n}\r\n\r\nlog_error() {\r\n    echo \"==========================================\"\r\n    echo \"ERROR: $1\"\r\n    echo \"==========================================\"\r\n}\r\n\r\nlog_info \"==========================================\"\r\nlog_info \"Arma Reforger Server - Installation\"\r\nlog_info \"Logging Level: ${INSTALL_LOG}\"\r\nlog_info \"==========================================\"\r\n\r\nlog_debug \"Working directory: $(pwd)\"\r\nlog_debug \"User: $(whoami)\"\r\nlog_debug \"App ID: ${SRCDS_APPID}\"\r\n\r\ncd /mnt/server\r\n\r\n## Check if jq is available (should be in custom Docker image)\r\nlog_step \"1/6\" \"Checking dependencies...\"\r\nif ! command -v jq &> /dev/null; then\r\n    log_substep \"jq not found, installing...\"\r\n    apt-get update > /dev/null 2>&1\r\n    apt-get install -y --no-install-recommends jq > /dev/null 2>&1\r\n    log_substep \"jq installed successfully\"\r\nelse\r\n    log_debug \"jq available: $(which jq)\"\r\nfi\r\n\r\n## Clean input variables\r\nlog_step \"2/6\" \"Configuring installation parameters...\"\r\nSERVER_NAME=\"$(echo \"$SERVER_NAME\" | xargs)\"\r\nRCON_PASSWORD=\"$(echo \"$RCON_PASSWORD\" | xargs)\"\r\nADMIN_PASS=\"$(echo \"$ADMIN_PASS\" | xargs)\"\r\nlog_debug \"Server name: ${SERVER_NAME}\"\r\nlog_debug \"App ID: ${SRCDS_APPID}\"\r\n\r\n## Set default steam credentials\r\nif [ -z \"${STEAM_USER}\" ] || [ -z \"${STEAM_PASS}\" ]; then\r\n    log_substep \"Using anonymous Steam login\"\r\n    STEAM_USER=anonymous\r\n    STEAM_PASS=\"\"\r\n    STEAM_AUTH=\"\"\r\nelse\r\n    log_substep \"Using Steam account: ${STEAM_USER}\"\r\nfi\r\n\r\n## Create required directories\r\nlog_step \"3/6\" \"Creating server directories...\"\r\nmkdir -p /mnt/server/profile /mnt/server/tmp\r\nlog_debug \"Directories created: profile, tmp\"\r\nlog_debug \"Setting permissions for steam user...\"\r\nchown -R steam:steam /mnt/server\r\n\r\n## Install game files via SteamCMD (must run as 'steam' user, not root)\r\nlog_step \"4/6\" \"Downloading Arma Reforger Server files (App ${SRCDS_APPID})...\"\r\nlog_debug \"Install directory: /mnt/server\"\r\n\r\n## Test network connectivity before attempting download\r\nlog_debug \"Testing network connectivity...\"\r\nif ping -c 1 8.8.8.8 > /dev/null 2>&1; then\r\n    log_debug \"Network connectivity OK (8.8.8.8)\"\r\nelif ping -c 1 1.1.1.1 > /dev/null 2>&1; then\r\n    log_debug \"Network connectivity OK (1.1.1.1)\"\r\nelse\r\n    log_error \"No network connectivity!\"\r\n    log_info \"The container cannot reach the internet.\"\r\n    log_info \"\"\r\n    log_info \"Troubleshooting steps:\"\r\n    log_info \"  1. Check Pterodactyl Wings network configuration\"\r\n    log_info \"  2. Verify Docker network: docker network ls\"\r\n    log_info \"  3. Check firewall rules on the host\"\r\n    log_info \"  4. Test: docker run --rm alpine ping -c 1 8.8.8.8\"\r\n    log_info \"\"\r\n    log_info \"Common causes:\"\r\n    log_info \"  - Wings network_mode misconfiguration\"\r\n    log_info \"  - Docker bridge network issues\"\r\n    log_info \"  - Host firewall blocking container traffic\"\r\n    log_info \"  - DNS resolution problems\"\r\n    log_info \"==========================================\"\r\n    exit 1\r\nfi\r\n\r\n## Test Steam connectivity\r\nlog_debug \"Testing Steam connectivity...\"\r\nif ping -c 1 steamcontent.com > /dev/null 2>&1 || ping -c 1 steamcdn-a.akamaihd.net > /dev/null 2>&1; then\r\n    log_debug \"Steam servers reachable\"\r\nelse\r\n    log_debug \"WARNING: Cannot ping Steam servers (may still work)\"\r\nfi\r\n\r\nlog_substep \"Starting SteamCMD download (this may take several minutes)...\"\r\n\r\nsu - steam -c \"/home/steam/steamcmd/steamcmd.sh +force_install_dir /mnt/server +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} +app_update ${SRCDS_APPID} ${INSTALL_FLAGS} validate +quit\"\r\n\r\nlog_substep \"Download completed\"\r\n\r\n## Verify installation\r\nlog_step \"5/6\" \"Verifying installation...\"\r\n\r\nif [ ! -f \"/mnt/server/ArmaReforgerServer\" ]; then\r\n    log_error \"Installation failed!\"\r\n    log_info \"The ArmaReforgerServer executable was not found.\"\r\n    log_info \"==========================================\"\r\n    if [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n        log_info \"Directory contents:\"\r\n        ls -lah /mnt/server/ || log_info \"Cannot list directory\"\r\n        log_info \"==========================================\"\r\n    fi\r\n    log_info \"Possible causes:\"\r\n    log_info \"  - Invalid Steam credentials\"\r\n    log_info \"  - Network connectivity issues\"\r\n    log_info \"  - Insufficient disk space\"\r\n    log_info \"  - Steam service is down\"\r\n    log_info \"  - Wrong App ID (current: ${SRCDS_APPID})\"\r\n    log_info \"==========================================\"\r\n    exit 1\r\nfi\r\n\r\nlog_substep \"ArmaReforgerServer found ($(du -h /mnt/server/ArmaReforgerServer | cut -f1))\"\r\n\r\n## Generate initial config.json\r\nlog_step \"6/6\" \"Generating default configuration...\"\r\ncat > /mnt/server/config.json << 'EOFCONFIG'\r\n{\r\n\t\"publicAddress\": \"SERVER_IP_PLACEHOLDER\",\r\n\t\"publicPort\": SERVER_PORT_PLACEHOLDER,\r\n\t\"a2s\": {\r\n\t\t\"address\": \"A2S_ADDRESS_PLACEHOLDER\",\r\n\t\t\"port\": A2S_PORT_PLACEHOLDER\r\n\t},\r\n\t\"rcon\": {\r\n\t\t\"address\": \"RCON_ADDRESS_PLACEHOLDER\",\r\n\t\t\"port\": RCON_PORT_PLACEHOLDER,\r\n\t\t\"password\": \"RCON_PASSWORD_PLACEHOLDER\",\r\n\t\t\"permission\": \"admin\"\r\n\t},\r\n\t\"game\": {\r\n\t\t\"name\": \"SERVER_NAME_PLACEHOLDER\",\r\n\t\t\"password\": \"SERVER_PASS_PLACEHOLDER\",\r\n\t\t\"passwordAdmin\": \"ADMIN_PASS_PLACEHOLDER\",\r\n\t\t\"admins\": ADMINS_JSON_PLACEHOLDER,\r\n\t\t\"scenarioId\": \"SCENARIO_ID_PLACEHOLDER\",\r\n\t\t\"maxPlayers\": MAX_PLAYERS_PLACEHOLDER,\r\n\t\t\"visible\": VISIBLE_PLACEHOLDER,\r\n\t\t\"crossPlatform\": CROSS_PLATFORM_PLACEHOLDER,\r\n\t\t\"supportedPlatforms\": [\"PLATFORM_PC\", \"PLATFORM_XBL\", \"PLATFORM_PSN\"],\r\n\t\t\"gameProperties\": {\r\n\t\t\t\"serverMaxViewDistance\": MAX_VIEW_DISTANCE_PLACEHOLDER,\r\n\t\t\t\"serverMinGrassDistance\": MIN_GRASS_DISTANCE_PLACEHOLDER,\r\n\t\t\t\"networkViewDistance\": NETWORK_VIEW_DISTANCE_PLACEHOLDER,\r\n\t\t\t\"disableThirdPerson\": DISABLE_THIRD_PLACEHOLDER,\r\n\t\t\t\"fastValidation\": true,\r\n\t\t\t\"battlEye\": BATTLEYE_PLACEHOLDER,\r\n\t\t\t\"VONDisableUI\": VON_DISABLE_UI_PLACEHOLDER,\r\n\t\t\t\"VONDisableDirectSpeechUI\": VON_DISABLE_DIRECT_UI_PLACEHOLDER,\r\n\t\t\t\"VONCanTransmitCrossFaction\": VON_CROSS_FACTION_PLACEHOLDER,\r\n\t\t\t\"missionHeader\": {}\r\n\t\t},\r\n\t\t\"modsRequiredByDefault\": MODS_REQUIRED_PLACEHOLDER,\r\n\t\t\"mods\": MODS_JSON_PLACEHOLDER\r\n\t},\r\n\t\"operating\": {\r\n\t\t\"aiLimit\": AI_LIMIT_PLACEHOLDER,\r\n\t\t\"disableAI\": DISABLE_AI_PLACEHOLDER,\r\n\t\t\"disableCrashReporter\": false,\r\n\t\t\"disableNavmeshStreaming\": [],\r\n\t\t\"disableServerShutdown\": DISABLE_SHUTDOWN_PLACEHOLDER,\r\n\t\t\"joinQueue\": {\r\n\t\t\t\"maxSize\": QUEUE_MAX_SIZE_PLACEHOLDER\r\n\t\t},\r\n\t\t\"lobbyPlayerSynchronise\": true,\r\n\t\t\"playerSaveTime\": PLAYER_SAVE_TIME_PLACEHOLDER,\r\n\t\t\"slotReservationTimeout\": SLOT_RESERVATION_TIMEOUT_PLACEHOLDER\r\n\t}\r\n}\r\nEOFCONFIG\r\n\r\n## Replace placeholders with actual values using sed\r\nsed -i \"s/SERVER_IP_PLACEHOLDER/${SERVER_IP}/g\" /mnt/server/config.json\r\nsed -i \"s/SERVER_PORT_PLACEHOLDER/${SERVER_PORT}/g\" /mnt/server/config.json\r\nsed -i \"s/A2S_ADDRESS_PLACEHOLDER/${A2S_ADDRESS}/g\" /mnt/server/config.json\r\nsed -i \"s/A2S_PORT_PLACEHOLDER/${A2S_PORT}/g\" /mnt/server/config.json\r\nsed -i \"s/RCON_ADDRESS_PLACEHOLDER/${RCON_ADDRESS}/g\" /mnt/server/config.json\r\nsed -i \"s/RCON_PORT_PLACEHOLDER/${RCON_PORT}/g\" /mnt/server/config.json\r\nsed -i \"s/RCON_PASSWORD_PLACEHOLDER/${RCON_PASSWORD}/g\" /mnt/server/config.json\r\nsed -i \"s/SERVER_NAME_PLACEHOLDER/${SERVER_NAME}/g\" /mnt/server/config.json\r\nsed -i \"s/SERVER_PASS_PLACEHOLDER/${SERVER_PASS}/g\" /mnt/server/config.json\r\nsed -i \"s/ADMIN_PASS_PLACEHOLDER/${ADMIN_PASS}/g\" /mnt/server/config.json\r\nsed -i \"s/ADMINS_JSON_PLACEHOLDER/${ADMINS_JSON}/g\" /mnt/server/config.json\r\nsed -i \"s|SCENARIO_ID_PLACEHOLDER|${SCENARIO_ID}|g\" /mnt/server/config.json\r\nsed -i \"s/MAX_PLAYERS_PLACEHOLDER/${MAX_PLAYERS}/g\" /mnt/server/config.json\r\nsed -i \"s/VISIBLE_PLACEHOLDER/${VISIBLE}/g\" /mnt/server/config.json\r\nsed -i \"s/CROSS_PLATFORM_PLACEHOLDER/${CROSS_PLATFORM}/g\" /mnt/server/config.json\r\nsed -i \"s/MAX_VIEW_DISTANCE_PLACEHOLDER/${MAX_VIEW_DISTANCE}/g\" /mnt/server/config.json\r\nsed -i \"s/MIN_GRASS_DISTANCE_PLACEHOLDER/${MIN_GRASS_DISTANCE}/g\" /mnt/server/config.json\r\nsed -i \"s/NETWORK_VIEW_DISTANCE_PLACEHOLDER/${NETWORK_VIEW_DISTANCE}/g\" /mnt/server/config.json\r\nsed -i \"s/DISABLE_THIRD_PLACEHOLDER/${DISABLE_THIRD}/g\" /mnt/server/config.json\r\nsed -i \"s/BATTLEYE_PLACEHOLDER/${BATTLEYE}/g\" /mnt/server/config.json\r\nsed -i \"s/VON_DISABLE_UI_PLACEHOLDER/${VON_DISABLE_UI}/g\" /mnt/server/config.json\r\nsed -i \"s/VON_DISABLE_DIRECT_UI_PLACEHOLDER/${VON_DISABLE_DIRECT_UI}/g\" /mnt/server/config.json\r\nsed -i \"s/VON_CROSS_FACTION_PLACEHOLDER/${VON_CROSS_FACTION}/g\" /mnt/server/config.json\r\nsed -i \"s/MODS_REQUIRED_PLACEHOLDER/${MODS_REQUIRED}/g\" /mnt/server/config.json\r\nsed -i \"s/MODS_JSON_PLACEHOLDER/${MODS_JSON}/g\" /mnt/server/config.json\r\nsed -i \"s/AI_LIMIT_PLACEHOLDER/${AI_LIMIT}/g\" /mnt/server/config.json\r\nsed -i \"s/DISABLE_AI_PLACEHOLDER/${DISABLE_AI}/g\" /mnt/server/config.json\r\nsed -i \"s/DISABLE_SHUTDOWN_PLACEHOLDER/${DISABLE_SHUTDOWN}/g\" /mnt/server/config.json\r\nsed -i \"s/QUEUE_MAX_SIZE_PLACEHOLDER/${QUEUE_MAX_SIZE}/g\" /mnt/server/config.json\r\nsed -i \"s/PLAYER_SAVE_TIME_PLACEHOLDER/${PLAYER_SAVE_TIME}/g\" /mnt/server/config.json\r\nsed -i \"s/SLOT_RESERVATION_TIMEOUT_PLACEHOLDER/${SLOT_RESERVATION_TIMEOUT}/g\" /mnt/server/config.json\r\n\r\nlog_debug \"Configuration template generated\"\r\nlog_debug \"Placeholders replaced with actual values\"\r\n\r\n## Validate generated config.json\r\nlog_substep \"Validating JSON structure...\"\r\nif jq empty /mnt/server/config.json 2>/dev/null; then\r\n    log_substep \"config.json is valid ✓\"\r\nelse\r\n    log_error \"config.json validation failed!\"\r\n    log_info \"The generated configuration contains invalid JSON.\"\r\n    log_info \"==========================================\"\r\n    if [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n        log_info \"config.json content:\"\r\n        cat /mnt/server/config.json || log_info \"Cannot read config.json\"\r\n        log_info \"==========================================\"\r\n        log_info \"Validation errors:\"\r\n        jq empty /mnt/server/config.json 2>&1\r\n    fi\r\n    log_info \"==========================================\"\r\n    exit 1\r\nfi\r\n\r\n## Generate startup script with informative logging\r\necho \"  -> Generating startup script...\"\r\ncat > /mnt/server/startup.sh << 'EOFSTARTUP'\r\n#!/bin/bash\r\n# Arma Reforger Server - Startup Script\r\n# This script displays server configuration and starts the Arma Reforger server\r\n\r\necho \"==========================================\"\r\necho \"Arma Reforger Dedicated Server - Starting\"\r\necho \"==========================================\"\r\necho \"\"\r\n\r\n# Display server configuration\r\necho \"[Server Configuration]\"\r\nif [ -f \"config.json\" ]; then\r\n    echo \"  Server Name:    $(jq -r '.game.name // \"N/A\"' config.json)\"\r\n    echo \"  Scenario:       $(jq -r '.game.scenarioId // \"N/A\"' config.json)\"\r\n    echo \"  Max Players:    $(jq -r '.game.maxPlayers // \"N/A\"' config.json)\"\r\n    echo \"  Bind IP:        ${SERVER_IP:-0.0.0.0}\"\r\n    echo \"  Bind Port:      ${SERVER_PORT:-2001}\"\r\n    echo \"  A2S Port:       $(jq -r '.a2s.port // \"N/A\"' config.json)\"\r\n    echo \"  RCON Port:      $(jq -r '.rcon.port // \"N/A\"' config.json)\"\r\n    echo \"  Crossplay:      $(jq -r '.game.crossPlatform // \"N/A\"' config.json)\"\r\n    echo \"  BattlEye:       $(jq -r '.game.gameProperties.battlEye // \"N/A\"' config.json)\"\r\n    echo \"  Visible:        $(jq -r '.game.visible // \"N/A\"' config.json)\"\r\n    echo \"\"\r\nelse\r\n    echo \"  WARNING: config.json not found!\"\r\n    echo \"\"\r\nfi\r\n\r\necho \"[Network Tuning]\"\r\necho \"  RPL Timeout:       ${RPL_TIMEOUT:-30000}ms\"\r\necho \"  NDS Diameter:      ${NDS:-0}\"\r\necho \"  Network Resolution: ${NWK_RESOLUTION:-500}m\"\r\necho \"  Staggering Budget: ${STAGGERING_BUDGET:-100}\"\r\necho \"  Streaming Budget:  ${STREAMING_BUDGET:-10000}\"\r\necho \"  Streams Delta:     ${STREAMS_DELTA:-50}\"\r\necho \"\"\r\n\r\necho \"[Performance]\"\r\necho \"  Max FPS:        ${MAX_FPS:-unlimited}\"\r\necho \"  Log Interval:   ${LOG_INTERVAL}s\"\r\necho \"  Keep Logs:      ${KEEP_NUM_LOGS:-10}\"\r\necho \"\"\r\n\r\necho \"[Directories]\"\r\necho \"  Config:         ./config.json\"\r\necho \"  Profile:        ./profile/\"\r\necho \"  Logs:           ./profile/console*.log\"\r\necho \"\"\r\n\r\necho \"==========================================\"\r\necho \"Converting boolean values in config.json...\"\r\nsed -i 's/\"true\"/true/g; s/\"false\"/false/g' config.json\r\necho \"Starting server...\"\r\necho \"==========================================\"\r\necho \"\"\r\n\r\n# Start the Arma Reforger server with all parameters\r\nexec ./ArmaReforgerServer \\\r\n    -bindIP \"${SERVER_IP:-0.0.0.0}\" \\\r\n    -bindPort \"${SERVER_PORT:-2001}\" \\\r\n    -config ./config.json \\\r\n    -profile ./profile \\\r\n    -logStats $((${LOG_INTERVAL}*1000)) \\\r\n    -maxFPS ${MAX_FPS} \\\r\n    -rpl-timeout-ms ${RPL_TIMEOUT} \\\r\n    -nds ${NDS} \\\r\n    -nwkResolution ${NWK_RESOLUTION} \\\r\n    -staggeringBudget ${STAGGERING_BUDGET} \\\r\n    -streamingBudget ${STREAMING_BUDGET} \\\r\n    -streamsDelta ${STREAMS_DELTA} \\\r\n    -keepNumOfLogs ${KEEP_NUM_LOGS}\r\nEOFSTARTUP\r\n\r\nchmod +x /mnt/server/startup.sh\r\nlog_substep \"Startup script created: startup.sh\"\r\n\r\n## Fix permissions one more time\r\nlog_debug \"Setting final permissions...\"\r\nchown -R steam:steam /mnt/server\r\n\r\nlog_info \"==========================================\"\r\nlog_info \"Installation completed successfully!\"\r\nlog_info \"==========================================\"\r\nlog_info \"Summary:\"\r\nlog_info \"  Server Binary: ArmaReforgerServer ($(du -h /mnt/server/ArmaReforgerServer | cut -f1))\"\r\nlog_info \"  Startup Script: startup.sh\"\r\nlog_info \"  Config File: config.json (validated)\"\r\nlog_info \"  Server Name: ${SERVER_NAME}\"\r\nlog_info \"  Max Players: ${MAX_PLAYERS}\"\r\nlog_info \"  Install Size: $(du -sh /mnt/server 2>/dev/null | cut -f1 || echo 'N/A')\"\r\nlog_info \"==========================================\"\r\n\r\nif [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n    log_debug \"Final directory listing:\"\r\n    ls -lah /mnt/server/ | head -20\r\n    log_debug \"=========================================\"\r\nfi\r\n",
+            "script": "#!/bin/bash\r\n# Arma Reforger Installation Script\r\n# Container: cm2network/steamcmd:root (runs as ROOT during install)\r\n# Runtime: cm2network/steamcmd:latest (runs as non-root)\r\n#\r\n# Server Files: /mnt/server (becomes /home/container at runtime)\r\n\r\n# Enable error reporting\r\nset -e  # Exit on any error\r\n\r\n##\r\n# Variables\r\n# SRCDS_APPID - 1874900 (Arma Reforger Dedicated Server)\r\n# INSTALL_LOG - DEBUG or INFO (default: INFO)\r\n##\r\n\r\n# Configure logging level\r\nINSTALL_LOG=\"${INSTALL_LOG:-INFO}\"\r\n\r\nif [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n    set -x  # Print each command before executing (verbose mode)\r\nfi\r\n\r\n# Logging functions\r\nlog_info() {\r\n    echo \"$1\"\r\n}\r\n\r\nlog_debug() {\r\n    if [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n        echo \"  [DEBUG] $1\"\r\n    fi\r\n}\r\n\r\nlog_step() {\r\n    echo \"[$1] $2\"\r\n}\r\n\r\nlog_substep() {\r\n    echo \"  -> $1\"\r\n}\r\n\r\nlog_error() {\r\n    echo \"==========================================\"\r\n    echo \"ERROR: $1\"\r\n    echo \"==========================================\"\r\n}\r\n\r\nlog_info \"==========================================\"\r\nlog_info \"Arma Reforger Server - Installation\"\r\nlog_info \"Logging Level: ${INSTALL_LOG}\"\r\nlog_info \"==========================================\"\r\n\r\nlog_debug \"Working directory: $(pwd)\"\r\nlog_debug \"User: $(whoami)\"\r\nlog_debug \"App ID: ${SRCDS_APPID}\"\r\n\r\ncd /mnt/server\r\n\r\n## Check if jq is available (should be in custom Docker image)\r\nlog_step \"1/6\" \"Checking dependencies...\"\r\nif ! command -v jq &> /dev/null; then\r\n    log_substep \"jq not found, installing...\"\r\n    apt-get update > /dev/null 2>&1\r\n    apt-get install -y --no-install-recommends jq > /dev/null 2>&1\r\n    log_substep \"jq installed successfully\"\r\nelse\r\n    log_debug \"jq available: $(which jq)\"\r\nfi\r\n\r\n## Clean input variables\r\nlog_step \"2/6\" \"Configuring installation parameters...\"\r\nSERVER_NAME=\"$(echo \"$SERVER_NAME\" | xargs)\"\r\nRCON_PASSWORD=\"$(echo \"$RCON_PASSWORD\" | xargs)\"\r\nADMIN_PASS=\"$(echo \"$ADMIN_PASS\" | xargs)\"\r\nlog_debug \"Server name: ${SERVER_NAME}\"\r\nlog_debug \"App ID: ${SRCDS_APPID}\"\r\n\r\n## Set default steam credentials\r\nif [ -z \"${STEAM_USER}\" ] || [ -z \"${STEAM_PASS}\" ]; then\r\n    log_substep \"Using anonymous Steam login\"\r\n    STEAM_USER=anonymous\r\n    STEAM_PASS=\"\"\r\n    STEAM_AUTH=\"\"\r\nelse\r\n    log_substep \"Using Steam account: ${STEAM_USER}\"\r\nfi\r\n\r\n## Create required directories\r\nlog_step \"3/6\" \"Creating server directories...\"\r\nmkdir -p /mnt/server/profile /mnt/server/tmp\r\nlog_debug \"Directories created: profile, tmp\"\r\nlog_debug \"Setting permissions for steam user...\"\r\nchown -R steam:steam /mnt/server\r\n\r\n## Install game files via SteamCMD (must run as 'steam' user, not root)\r\nlog_step \"4/6\" \"Downloading Arma Reforger Server files (App ${SRCDS_APPID})...\"\r\nlog_debug \"Install directory: /mnt/server\"\r\n\r\n## Test network connectivity before attempting download\r\nlog_debug \"Testing network connectivity...\"\r\nif ping -c 1 8.8.8.8 > /dev/null 2>&1; then\r\n    log_debug \"Network connectivity OK (8.8.8.8)\"\r\nelif ping -c 1 1.1.1.1 > /dev/null 2>&1; then\r\n    log_debug \"Network connectivity OK (1.1.1.1)\"\r\nelse\r\n    log_error \"No network connectivity!\"\r\n    log_info \"The container cannot reach the internet.\"\r\n    log_info \"\"\r\n    log_info \"Troubleshooting steps:\"\r\n    log_info \"  1. Check Pterodactyl Wings network configuration\"\r\n    log_info \"  2. Verify Docker network: docker network ls\"\r\n    log_info \"  3. Check firewall rules on the host\"\r\n    log_info \"  4. Test: docker run --rm alpine ping -c 1 8.8.8.8\"\r\n    log_info \"\"\r\n    log_info \"Common causes:\"\r\n    log_info \"  - Wings network_mode misconfiguration\"\r\n    log_info \"  - Docker bridge network issues\"\r\n    log_info \"  - Host firewall blocking container traffic\"\r\n    log_info \"  - DNS resolution problems\"\r\n    log_info \"==========================================\"\r\n    exit 1\r\nfi\r\n\r\n## Test Steam connectivity\r\nlog_debug \"Testing Steam connectivity...\"\r\nif ping -c 1 steamcontent.com > /dev/null 2>&1 || ping -c 1 steamcdn-a.akamaihd.net > /dev/null 2>&1; then\r\n    log_debug \"Steam servers reachable\"\r\nelse\r\n    log_debug \"WARNING: Cannot ping Steam servers (may still work)\"\r\nfi\r\n\r\nlog_substep \"Starting SteamCMD download (this may take several minutes)...\"\r\n\r\nsu - steam -c \"/home/steam/steamcmd/steamcmd.sh +force_install_dir /mnt/server +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} +app_update ${SRCDS_APPID} ${INSTALL_FLAGS} validate +quit\"\r\n\r\nlog_substep \"Download completed\"\r\n\r\n## Verify installation\r\nlog_step \"5/6\" \"Verifying installation...\"\r\n\r\nif [ ! -f \"/mnt/server/ArmaReforgerServer\" ]; then\r\n    log_error \"Installation failed!\"\r\n    log_info \"The ArmaReforgerServer executable was not found.\"\r\n    log_info \"==========================================\"\r\n    if [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n        log_info \"Directory contents:\"\r\n        ls -lah /mnt/server/ || log_info \"Cannot list directory\"\r\n        log_info \"==========================================\"\r\n    fi\r\n    log_info \"Possible causes:\"\r\n    log_info \"  - Invalid Steam credentials\"\r\n    log_info \"  - Network connectivity issues\"\r\n    log_info \"  - Insufficient disk space\"\r\n    log_info \"  - Steam service is down\"\r\n    log_info \"  - Wrong App ID (current: ${SRCDS_APPID})\"\r\n    log_info \"==========================================\"\r\n    exit 1\r\nfi\r\n\r\nlog_substep \"ArmaReforgerServer found ($(du -h /mnt/server/ArmaReforgerServer | cut -f1))\"\r\n\r\n## Generate minimal config.json template (Pterodactyl will populate via config.files parser)\r\nlog_step \"6/6\" \"Generating configuration template...\"\r\ncat > /mnt/server/config.json << 'EOFCONFIG'\r\n{\r\n\t\"bindAddress\": \"0.0.0.0\",\r\n\t\"bindPort\": 2001,\r\n\t\"publicAddress\": \"0.0.0.0\",\r\n\t\"publicPort\": 2001,\r\n\t\"a2s\": {\r\n\t\t\"address\": \"0.0.0.0\",\r\n\t\t\"port\": 17777\r\n\t},\r\n\t\"rcon\": {\r\n\t\t\"address\": \"0.0.0.0\",\r\n\t\t\"port\": 19998,\r\n\t\t\"password\": \"changeme\",\r\n\t\t\"permission\": \"admin\"\r\n\t},\r\n\t\"game\": {\r\n\t\t\"name\": \"Arma Reforger Server\",\r\n\t\t\"password\": \"\",\r\n\t\t\"passwordAdmin\": \"changeme\",\r\n\t\t\"admins\": [],\r\n\t\t\"scenarioId\": \"{ECC61978EDCC2B5A}Missions/23_Campaign.conf\",\r\n\t\t\"maxPlayers\": 64,\r\n\t\t\"visible\": true,\r\n\t\t\"crossPlatform\": true,\r\n\t\t\"supportedPlatforms\": [\"PLATFORM_PC\", \"PLATFORM_XBL\", \"PLATFORM_PSN\"],\r\n\t\t\"gameProperties\": {\r\n\t\t\t\"serverMaxViewDistance\": 5000,\r\n\t\t\t\"serverMinGrassDistance\": 50,\r\n\t\t\t\"networkViewDistance\": 1500,\r\n\t\t\t\"disableThirdPerson\": false,\r\n\t\t\t\"fastValidation\": true,\r\n\t\t\t\"battlEye\": true,\r\n\t\t\t\"VONDisableUI\": false,\r\n\t\t\t\"VONDisableDirectSpeechUI\": false,\r\n\t\t\t\"VONCanTransmitCrossFaction\": false,\r\n\t\t\t\"missionHeader\": {}\r\n\t\t},\r\n\t\t\"modsRequiredByDefault\": false,\r\n\t\t\"mods\": []\r\n\t},\r\n\t\"operating\": {\r\n\t\t\"aiLimit\": -1,\r\n\t\t\"disableAI\": false,\r\n\t\t\"disableCrashReporter\": false,\r\n\t\t\"disableNavmeshStreaming\": [],\r\n\t\t\"disableServerShutdown\": true,\r\n\t\t\"joinQueue\": {\r\n\t\t\t\"maxSize\": 30\r\n\t\t},\r\n\t\t\"lobbyPlayerSynchronise\": true,\r\n\t\t\"playerSaveTime\": 120,\r\n\t\t\"slotReservationTimeout\": 60\r\n\t}\r\n}\r\nEOFCONFIG\r\n\r\nlog_substep \"Configuration template created (will be populated by panel)\"\r\nlog_debug \"Panel will update config.json via config.files parser on server start\"\r\n\r\n## Validate generated config.json\r\nlog_substep \"Validating JSON structure...\"\r\nif jq empty /mnt/server/config.json 2>/dev/null; then\r\n    log_substep \"config.json is valid ✓\"\r\nelse\r\n    log_error \"config.json validation failed!\"\r\n    log_info \"The generated configuration contains invalid JSON.\"\r\n    log_info \"==========================================\"\r\n    if [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n        log_info \"config.json content:\"\r\n        cat /mnt/server/config.json || log_info \"Cannot read config.json\"\r\n        log_info \"==========================================\"\r\n        log_info \"Validation errors:\"\r\n        jq empty /mnt/server/config.json 2>&1\r\n    fi\r\n    log_info \"==========================================\"\r\n    exit 1\r\nfi\r\n\r\n## Generate startup script with informative logging\r\necho \"  -> Generating startup script...\"\r\ncat > /mnt/server/startup.sh << 'EOFSTARTUP'\r\n#!/bin/bash\r\n# Arma Reforger Server - Startup Script\r\n# This script displays server configuration and starts the Arma Reforger server\r\n\r\necho \"==========================================\"\r\necho \"Arma Reforger Dedicated Server - Starting\"\r\necho \"==========================================\"\r\necho \"\"\r\n\r\n# Display server configuration\r\necho \"[Server Configuration]\"\r\nif [ -f \"config.json\" ]; then\r\n    echo \"  Server Name:    $(jq -r '.game.name // \"N/A\"' config.json)\"\r\n    echo \"  Scenario:       $(jq -r '.game.scenarioId // \"N/A\"' config.json)\"\r\n    echo \"  Max Players:    $(jq -r '.game.maxPlayers // \"N/A\"' config.json)\"\r\n    echo \"  Bind IP:        ${SERVER_IP:-0.0.0.0}\"\r\n    echo \"  Bind Port:      ${SERVER_PORT:-2001}\"\r\n    echo \"  A2S Port:       $(jq -r '.a2s.port // \"N/A\"' config.json)\"\r\n    echo \"  RCON Port:      $(jq -r '.rcon.port // \"N/A\"' config.json)\"\r\n    echo \"  Crossplay:      $(jq -r '.game.crossPlatform // \"N/A\"' config.json)\"\r\n    echo \"  BattlEye:       $(jq -r '.game.gameProperties.battlEye // \"N/A\"' config.json)\"\r\n    echo \"  Visible:        $(jq -r '.game.visible // \"N/A\"' config.json)\"\r\n    echo \"\"\r\nelse\r\n    echo \"  WARNING: config.json not found!\"\r\n    echo \"\"\r\nfi\r\n\r\necho \"[Network Tuning]\"\r\necho \"  RPL Timeout:       ${RPL_TIMEOUT:-30000}ms\"\r\necho \"  NDS Diameter:      ${NDS:-0}\"\r\necho \"  Network Resolution: ${NWK_RESOLUTION:-500}m\"\r\necho \"  Staggering Budget: ${STAGGERING_BUDGET:-100}\"\r\necho \"  Streaming Budget:  ${STREAMING_BUDGET:-10000}\"\r\necho \"  Streams Delta:     ${STREAMS_DELTA:-50}\"\r\necho \"\"\r\n\r\necho \"[Performance]\"\r\necho \"  Max FPS:        ${MAX_FPS:-unlimited}\"\r\necho \"  Log Interval:   ${LOG_INTERVAL}s\"\r\necho \"  Keep Logs:      ${KEEP_NUM_LOGS:-10}\"\r\necho \"\"\r\n\r\necho \"[Directories]\"\r\necho \"  Config:         ./config.json\"\r\necho \"  Profile:        ./profile/\"\r\necho \"  Logs:           ./profile/console*.log\"\r\necho \"\"\r\n\r\necho \"==========================================\"\r\necho \"Converting boolean values in config.json...\"\r\nsed -i 's/\"true\"/true/g; s/\"false\"/false/g' config.json\r\necho \"Starting server...\"\r\necho \"==========================================\"\r\necho \"\"\r\n\r\n# Start the Arma Reforger server with all parameters\r\nexec ./ArmaReforgerServer \\\r\n    -bindIP \"${SERVER_IP:-0.0.0.0}\" \\\r\n    -bindPort \"${SERVER_PORT:-2001}\" \\\r\n    -config ./config.json \\\r\n    -profile ./profile \\\r\n    -logStats $((${LOG_INTERVAL}*1000)) \\\r\n    -maxFPS ${MAX_FPS} \\\r\n    -rpl-timeout-ms ${RPL_TIMEOUT} \\\r\n    -nds ${NDS} \\\r\n    -nwkResolution ${NWK_RESOLUTION} \\\r\n    -staggeringBudget ${STAGGERING_BUDGET} \\\r\n    -streamingBudget ${STREAMING_BUDGET} \\\r\n    -streamsDelta ${STREAMS_DELTA} \\\r\n    -keepNumOfLogs ${KEEP_NUM_LOGS}\r\nEOFSTARTUP\r\n\r\nchmod +x /mnt/server/startup.sh\r\nlog_substep \"Startup script created: startup.sh\"\r\n\r\n## Fix permissions one more time\r\nlog_debug \"Setting final permissions...\"\r\nchown -R steam:steam /mnt/server\r\n\r\nlog_info \"==========================================\"\r\nlog_info \"Installation completed successfully!\"\r\nlog_info \"==========================================\"\r\nlog_info \"Summary:\"\r\nlog_info \"  Server Binary: ArmaReforgerServer ($(du -h /mnt/server/ArmaReforgerServer | cut -f1))\"\r\nlog_info \"  Startup Script: startup.sh\"\r\nlog_info \"  Config File: config.json (validated)\"\r\nlog_info \"  Server Name: ${SERVER_NAME}\"\r\nlog_info \"  Max Players: ${MAX_PLAYERS}\"\r\nlog_info \"  Install Size: $(du -sh /mnt/server 2>/dev/null | cut -f1 || echo 'N/A')\"\r\nlog_info \"==========================================\"\r\n\r\nif [ \"${INSTALL_LOG}\" = \"DEBUG\" ]; then\r\n    log_debug \"Final directory listing:\"\r\n    ls -lah /mnt/server/ | head -20\r\n    log_debug \"=========================================\"\r\nfi\r\n",
             "container": "fabriciojrsilva/steamcmd-eggs:installer",
             "entrypoint": "/bin/bash"
         }
     },
     "variables": [
+
          {
+            "name": "Server Name",
+            "description": "The name of your server as it appears in the server browser",
+            "env_variable": "SERVER_NAME",
+            "default_value": "Arma Reforger Server",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:255",
+            "field_type": "text"
+        },        
+        {
+            "name": "[Advanced] Arma Reforger App ID",
+            "description": "Steam Application ID for Arma Reforger Dedicated Server",
+            "env_variable": "SRCDS_APPID",
+            "default_value": "1874900",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|integer",
+            "field_type": "text"
+        },
+        {
             "name": "[Advanced] Installation Log Level",
-            "description": "Controls verbosity of installation logs. DEBUG: Shows all commands and detailed output. INFO: Shows only essential progress messages.",
+            "description": "Logging verbosity during server installation. INFO for normal output, DEBUG for detailed troubleshooting",
             "env_variable": "INSTALL_LOG",
             "default_value": "INFO",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|string|in:DEBUG,INFO",
+            "rules": "required|string|in:INFO,DEBUG",
             "field_type": "text"
         },
+       
         {
             "name": "[Network] A2S Address",
-            "description": "Steam Query (A2S) bind address. Use 0.0.0.0 for all interfaces.",
+            "description": "Address for Steam A2S query protocol (0.0.0.0 for all interfaces)",
             "env_variable": "A2S_ADDRESS",
             "default_value": "0.0.0.0",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|string",
+            "rules": "required|string|max:15",
             "field_type": "text"
         },
         {
             "name": "[Network] A2S Port",
-            "description": "Steam Query (A2S) port for server listing and info.",
+            "description": "Port for Steam A2S query protocol (server browser)",
             "env_variable": "A2S_PORT",
             "default_value": "17777",
             "user_viewable": true,
@@ -64,17 +86,17 @@
         },
         {
             "name": "[Network] RCON Address",
-            "description": "RCON bind address for remote administration. Use 0.0.0.0 for all interfaces.",
+            "description": "Address for RCON remote administration (0.0.0.0 for all interfaces)",
             "env_variable": "RCON_ADDRESS",
             "default_value": "0.0.0.0",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|string",
+            "rules": "required|string|max:15",
             "field_type": "text"
         },
         {
             "name": "[Network] RCON Port",
-            "description": "RCON port for remote server administration.",
+            "description": "Port for RCON remote administration",
             "env_variable": "RCON_PORT",
             "default_value": "19998",
             "user_viewable": true,
@@ -84,8 +106,18 @@
         },
         {
             "name": "[Network] RCON Password",
-            "description": "Password for RCON remote administration access.",
+            "description": "Password for RCON remote administration access",
             "env_variable": "RCON_PASSWORD",
+            "default_value": "admin123",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|min:6|max:64",
+            "field_type": "text"
+        },
+        {
+            "name": "Server Password",
+            "description": "Password required to join the server (leave empty for public access)",
+            "env_variable": "SERVER_PASS",
             "default_value": "",
             "user_viewable": true,
             "user_editable": true,
@@ -93,88 +125,38 @@
             "field_type": "text"
         },
         {
-            "name": "Server IP",
-            "description": "Public IP address for the server. Use server.build.default.ip for Pterodactyl managed IP, or specify custom IP.",
-            "env_variable": "SERVER_IP",
-            "default_value": "{{server.build.default.ip}}",
+            "name": "Admin Password",
+            "description": "Password for in-game admin access",
+            "env_variable": "ADMIN_PASS",
+            "default_value": "admin123",
             "user_viewable": true,
-            "user_editable": false,
-            "rules": "required|string",
+            "user_editable": true,
+            "rules": "required|string|min:6|max:64",
             "field_type": "text"
         },
         {
-            "name": "Server Port",
-            "description": "Main game server port. This is the primary port for game traffic.",
-            "env_variable": "SERVER_PORT",
-            "default_value": "{{server.build.default.port}}",
-            "user_viewable": true,
-            "user_editable": false,
-            "rules": "required|integer|between:1024,65535",
-            "field_type": "text"
-        },
-        {
-            "name": "Server Name",
-            "description": "Name displayed in the server browser.",
-            "env_variable": "SERVER_NAME",
-            "default_value": "Arma Reforger Server",
+            "name": "[Gameplay] Scenario ID",
+            "description": "Mission/scenario configuration path. Example: {ECC61978EDCC2B5A}Missions/23_Campaign.conf",
+            "env_variable": "SCENARIO_ID",
+            "default_value": "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string|max:255",
             "field_type": "text"
         },
         {
-            "name": "Server Password",
-            "description": "Password required for clients to enter before they can join the server. Leave empty to have no password.",
-            "env_variable": "SERVER_PASS",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "nullable|string|max:32",
-            "field_type": "text"
-        },
-        {
-            "name": "Admin Password",
-            "description": "",
-            "env_variable": "ADMIN_PASS",
-            "default_value": "gmaster@999",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "nullable|string|max:32",
-            "field_type": "text"
-        },
-        {
-            "name": "Server Admins (JSON)",
-            "description": "JSON array of admin GUIDs. Format: [\"guid1\",\"guid2\",\"guid3\"]. Leave as [] for no admins. Use https://jsonlint.com to validate your JSON before pasting.",
-            "env_variable": "ADMINS_JSON",
-            "default_value": "[]",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|string",
-            "field_type": "text"
-        },
-        {
-            "name": "Scenario ID",
-            "description": "ID of scenario to run/play. Valid IDs can be viewed in the console upon startup of the server.",
-            "env_variable": "SCENARIO_ID",
-            "default_value": "{ECC61978EDCC2B5A}Missions/23_Campaign.conf",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|string",
-            "field_type": "text"
-        },
-        {
-            "name": "Max Players",
-            "description": "Maximum number of players allowed to join the server.",
+            "name": "[Gameplay] Max Players",
+            "description": "Maximum number of players allowed on the server",
             "env_variable": "MAX_PLAYERS",
-            "default_value": "128",
+            "default_value": "64",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|integer|between:1,256",
             "field_type": "text"
         },
         {
-            "name": "Visible in Server Browser",
-            "description": "Set the visibility of the server in the Server Browser.",
+            "name": "[Gameplay] Server Visible",
+            "description": "Show server in the server browser",
             "env_variable": "VISIBLE",
             "default_value": "true",
             "user_viewable": true,
@@ -183,8 +165,8 @@
             "field_type": "text"
         },
         {
-            "name": "[Gameplay] Enable Crossplay",
-            "description": "Enable crossplay between PC, Xbox, and PlayStation platforms.",
+            "name": "[Gameplay] Crossplay Enabled",
+            "description": "Enable crossplay between PC, Xbox, and PlayStation",
             "env_variable": "CROSS_PLATFORM",
             "default_value": "true",
             "user_viewable": true,
@@ -194,27 +176,27 @@
         },
         {
             "name": "[Graphics] Max View Distance",
-            "description": "Maximum view distance in meters (serverMaxViewDistance).",
+            "description": "Maximum rendering distance in meters (1600-10000)",
             "env_variable": "MAX_VIEW_DISTANCE",
             "default_value": "5000",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|integer|between:500,10000",
+            "rules": "required|integer|between:1600,10000",
             "field_type": "text"
         },
         {
             "name": "[Graphics] Min Grass Distance",
-            "description": "Minimum grass rendering distance in meters (serverMinGrassDistance).",
+            "description": "Minimum grass rendering distance in meters (0-150)",
             "env_variable": "MIN_GRASS_DISTANCE",
             "default_value": "150",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|integer|between:0,500",
+            "rules": "required|integer|between:0,150",
             "field_type": "text"
         },
         {
             "name": "[Graphics] Network View Distance",
-            "description": "Network synchronization view distance in meters.",
+            "description": "Network synchronization distance in meters (500-5000)",
             "env_variable": "NETWORK_VIEW_DISTANCE",
             "default_value": "1500",
             "user_viewable": true,
@@ -223,18 +205,18 @@
             "field_type": "text"
         },
         {
-            "name": "Disable Third Person",
-            "description": "",
+            "name": "[Gameplay] Disable Third Person",
+            "description": "Disable third person camera view",
             "env_variable": "DISABLE_THIRD",
-            "default_value": "true",
+            "default_value": "false",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string|in:true,false",
             "field_type": "text"
         },
         {
-            "name": "Enable BattlEye",
-            "description": "Enables the anti-cheat engine on the server and requires all clients to be running it.",
+            "name": "[Gameplay] BattlEye Anti-Cheat",
+            "description": "Enable BattlEye anti-cheat protection",
             "env_variable": "BATTLEYE",
             "default_value": "false",
             "user_viewable": true,
@@ -243,8 +225,8 @@
             "field_type": "text"
         },
         {
-            "name": "[Voice] VON Disable UI",
-            "description": "Disable Voice-over-Network UI elements.",
+            "name": "[Voice] Disable VON UI",
+            "description": "Disable Voice-over-Network UI indicators",
             "env_variable": "VON_DISABLE_UI",
             "default_value": "false",
             "user_viewable": true,
@@ -253,8 +235,8 @@
             "field_type": "text"
         },
         {
-            "name": "[Voice] VON Disable Direct Speech UI",
-            "description": "Disable direct speech UI in Voice-over-Network.",
+            "name": "[Voice] Disable Direct Speech UI",
+            "description": "Disable direct speech UI indicators in VON",
             "env_variable": "VON_DISABLE_DIRECT_UI",
             "default_value": "false",
             "user_viewable": true,
@@ -263,8 +245,8 @@
             "field_type": "text"
         },
         {
-            "name": "[Voice] VON Cross Faction Communication",
-            "description": "Allow voice communication between opposing factions.",
+            "name": "[Voice] Cross-Faction VON",
+            "description": "Allow voice transmission across enemy factions",
             "env_variable": "VON_CROSS_FACTION",
             "default_value": "false",
             "user_viewable": true,
@@ -273,38 +255,28 @@
             "field_type": "text"
         },
         {
-            "name": "[Gameplay] Mods Required By Default",
-            "description": "If true, all server mods are required for players to join.",
+            "name": "[Gameplay] Mods Required by Default",
+            "description": "Require players to have workshop mods to join",
             "env_variable": "MODS_REQUIRED",
-            "default_value": "true",
+            "default_value": "false",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string|in:true,false",
             "field_type": "text"
         },
         {
-            "name": "[Mods] Mods List (JSON)",
-            "description": "JSON array of mods. Format: [{\"name\":\"ModName\",\"modId\":\"ID\",\"version\":\"1.0.0\"}]. Leave as [] for no mods. Use https://jsonlint.com to validate your JSON before pasting.",
-            "env_variable": "MODS_JSON",
-            "default_value": "[]",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|string",
-            "field_type": "text"
-        },
-        {
             "name": "[Operating] AI Limit",
-            "description": "Maximum number of AI units. Set to -1 for unlimited.",
+            "description": "Maximum number of AI entities (-1 for unlimited)",
             "env_variable": "AI_LIMIT",
             "default_value": "-1",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|integer|min:-1",
+            "rules": "required|integer|between:-1,10000",
             "field_type": "text"
         },
         {
             "name": "[Operating] Disable AI",
-            "description": "Completely disable AI on the server.",
+            "description": "Completely disable AI on the server",
             "env_variable": "DISABLE_AI",
             "default_value": "true",
             "user_viewable": true,
@@ -314,7 +286,7 @@
         },
         {
             "name": "[Operating] Disable Server Shutdown",
-            "description": "Prevent automatic server shutdown.",
+            "description": "Prevent automatic server shutdown when empty",
             "env_variable": "DISABLE_SHUTDOWN",
             "default_value": "true",
             "user_viewable": true,
@@ -323,18 +295,18 @@
             "field_type": "text"
         },
         {
-            "name": "[Operating] Join Queue Max Size",
-            "description": "Maximum number of players that can be in the join queue.",
+            "name": "[Operating] Queue Max Size",
+            "description": "Maximum number of players in the join queue",
             "env_variable": "QUEUE_MAX_SIZE",
-            "default_value": "45",
+            "default_value": "30",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|integer|between:0,500",
+            "rules": "required|integer|between:0,100",
             "field_type": "text"
         },
         {
-            "name": "[Operating] Player Save Time",
-            "description": "Interval in seconds to save player data.",
+            "name": "[Operating] Player Save Interval",
+            "description": "Player data save interval in seconds",
             "env_variable": "PLAYER_SAVE_TIME",
             "default_value": "120",
             "user_viewable": true,
@@ -344,7 +316,7 @@
         },
         {
             "name": "[Operating] Slot Reservation Timeout",
-            "description": "Time in seconds before a reserved slot expires.",
+            "description": "Timeout for reserved player slots in seconds",
             "env_variable": "SLOT_RESERVATION_TIMEOUT",
             "default_value": "60",
             "user_viewable": true,
@@ -353,153 +325,93 @@
             "field_type": "text"
         },
         {
-            "name": "Automatic Updates",
-            "description": "Quickly checks for any server or mod updates on startup, and updates if necessary.",
-            "env_variable": "AUTO_UPDATE",
-            "default_value": "1",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "boolean",
-            "field_type": "text"
-        },
-        {
-            "name": "[Advanced] Arma Reforger Dedicated Server App ID",
-            "description": "Used for installation and updates. Rarely needs to be changed.",
-            "env_variable": "SRCDS_APPID",
-            "default_value": "1874900",
-            "user_viewable": false,
-            "user_editable": false,
-            "rules": "required|integer",
-            "field_type": "text"
-        },
-        {
-            "name": "[Advanced] Log FPS Interval",
-            "description": "How often (in seconds) to log the FPS and other debug stats to the console. Set to 0 to disable.",
-            "env_variable": "LOG_INTERVAL",
-            "default_value": "1000",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|integer|min:0",
-            "field_type": "text"
-        },
-        {
-            "name": "[Advanced] Max FPS",
-            "description": "Sets a maximum FPS limit for the server, saving performance in some cases. Leave empty for no limit.",
+            "name": "[Advanced Startup] Max FPS",
+            "description": "Maximum server FPS (0 for unlimited)",
             "env_variable": "MAX_FPS",
-            "default_value": "120",
+            "default_value": "60",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "nullable|integer|gt:0",
+            "rules": "required|integer|between:0,240",
             "field_type": "text"
         },
         {
-            "name": "[Advanced] RPL Timeout (ms)",
-            "description": "RPL (Replication Protocol Layer) timeout in milliseconds. Controls network replication timeout threshold.",
-            "env_variable": "RPL_TIMEOUT",
-            "default_value": "10000",
+            "name": "[Advanced Startup] Log Stats Interval",
+            "description": "Server statistics logging interval in seconds",
+            "env_variable": "LOG_INTERVAL",
+            "default_value": "60",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|integer|between:1000,120000",
+            "rules": "required|integer|between:10,600",
             "field_type": "text"
         },
         {
-            "name": "[Network Tuning] NDS Diameter",
-            "description": "Network Dynamic Simulation diameter (number of cells replicated). Higher = bigger networked view range but lower server performance. Use 0 to disable.",
-            "env_variable": "NDS",
-            "default_value": "1",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|integer|between:0,100",
-            "field_type": "text"
-        },
-        {
-            "name": "[Network Tuning] Network Resolution (m)",
-            "description": "Spatial Map cell resolution in meters. Smaller = less pop-in but lower view range. Higher = more view range. Range: 100-1000m.",
-            "env_variable": "NWK_RESOLUTION",
-            "default_value": "250",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|integer|between:100,1000",
-            "field_type": "text"
-        },
-        {
-            "name": "[Network Tuning] Staggering Budget",
-            "description": "Stationary spatial map cells processed per tick. Lower = less server load but slower entity streaming. Higher = faster streaming but more load. Range: 1-10201.",
-            "env_variable": "STAGGERING_BUDGET",
-            "default_value": "2500",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|integer|between:1,10201",
-            "field_type": "text"
-        },
-        {
-            "name": "[Network Tuning] Streaming Budget",
-            "description": "Global streaming budget distributed between connections (minimum 100). Lower = less server load but slower entity streaming.",
-            "env_variable": "STREAMING_BUDGET",
-            "default_value": "400",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|integer|between:100,10000",
-            "field_type": "text"
-        },
-        {
-            "name": "[Network Tuning] Streams Delta",
-            "description": "Limits stream opening rate for clients. Adjust based on average client network speed. Range: 1-1000.",
-            "env_variable": "STREAMS_DELTA",
-            "default_value": "250",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|integer|between:1,1000",
-            "field_type": "text"
-        },
-        {
-            "name": "[Advanced] Keep Number of Logs",
-            "description": "Maximum number of log files to keep on disk.",
+            "name": "[Advanced Startup] Keep Number of Logs",
+            "description": "Number of console log files to retain",
             "env_variable": "KEEP_NUM_LOGS",
             "default_value": "10",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|integer|between:1,100",
             "field_type": "text"
-        },       
+        },
         {
-            "name": "[Repair] Validate Server Files",
-            "description": "\"true\" to enable; empty to disable. Validates all server files when Automatic Updates is enabled. Note: This will significantly increase server startup times, so it is recommended to only enable this when needed.",
-            "env_variable": "VALIDATE",
-            "default_value": "",
+            "name": "[Advanced Startup] RPL Timeout (ms)",
+            "description": "Replication layer timeout in milliseconds",
+            "env_variable": "RPL_TIMEOUT",
+            "default_value": "30000",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "nullable|string",
+            "rules": "required|integer|between:10000,120000",
             "field_type": "text"
         },
         {
-            "name": "[Advanced] Steam Username",
-            "description": "REQUIRED: Steam account username that owns Arma Reforger. Leave empty for anonymous login (will fail for Arma Reforger). The account must own the game or have dedicated server hosting rights.",
-            "env_variable": "STEAM_USER",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "nullable|string|max:100",
+            "name": "[Advanced Startup] NDS Diameter",
+            "description": "Network Diameter Setting (0 for automatic)",
+            "env_variable": "NDS",
+            "default_value": "1",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|integer|between:0,1000",
             "field_type": "text"
         },
         {
-            "name": "[Advanced] Steam Password",
-            "description": "REQUIRED: Steam account password. Required for Arma Reforger dedicated server downloads. If Steam Guard (2FA) is enabled, you may need to provide the code below or disable it temporarily.",
-            "env_variable": "STEAM_PASS",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "nullable|string|max:100",
+            "name": "[Advanced Startup] Network Resolution (m)",
+            "description": "Network synchronization resolution in meters",
+            "env_variable": "NWK_RESOLUTION",
+            "default_value": "250",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|integer|between:100,2000",
             "field_type": "text"
         },
         {
-            "name": "[Advanced] Steam Guard Code",
-            "description": "Optional: Steam Guard 2FA code. Only required if Steam Guard is enabled on the account. Leave empty if 2FA is disabled.",
-            "env_variable": "STEAM_AUTH",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "nullable|string|max:10",
+            "name": "[Advanced Startup] Staggering Budget",
+            "description": "Network staggering budget for load balancing",
+            "env_variable": "STAGGERING_BUDGET",
+            "default_value": "2500",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|integer|between:10,10000",
+            "field_type": "text"
+        },
+        {
+            "name": "[Advanced Startup] Streaming Budget",
+            "description": "Network streaming budget for performance tuning",
+            "env_variable": "STREAMING_BUDGET",
+            "default_value": "400",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|integer|between:100,100000",
+            "field_type": "text"
+        },
+        {
+            "name": "[Advanced Startup] Streams Delta",
+            "description": "Network streams delta for replication management",
+            "env_variable": "STREAMS_DELTA",
+            "default_value": "250",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|integer|between:10,500",
             "field_type": "text"
         }
     ]
