@@ -1,9 +1,9 @@
 #!/bin/bash
 # Arma Reforger Installation Script
-# Container: cm2network/steamcmd:root (runs as ROOT during install)
-# Runtime: cm2network/steamcmd:latest (runs as non-root)
+# Container: fabriciojrsilva/steamcmd-eggs:installer (runs as ROOT during install)
+# Runtime: cm2network/steamcmd:latest (runs as non-root steam user)
 #
-# Server Files: /mnt/server (becomes /home/container at runtime)
+# Server Files: /mnt/server (mounted to /home/container at runtime)
 
 # Enable error reporting
 set -e  # Exit on any error
@@ -88,36 +88,71 @@ fi
 
 ## Create required directories
 log_step "3/6" "Creating server directories..."
-mkdir -p /mnt/server/profile /mnt/server/tmp
-log_debug "Directories created: profile, tmp"
-log_debug "Setting permissions for steam user..."
-chown -R steam:steam /mnt/server
+mkdir -p /mnt/server/steamcmd
+mkdir -p /mnt/server/steamapps
+mkdir -p /mnt/server/profile
+mkdir -p /mnt/server/tmp
+log_debug "Directories created: steamcmd, steamapps, profile, tmp"
+log_debug "Setting HOME environment variable..."
+export HOME=/mnt/server
 
-## Install game files via SteamCMD (must run as 'steam' user, not root)
+## Install game files via SteamCMD (runs as ROOT with HOME=/mnt/server)
 log_step "4/6" "Downloading Arma Reforger Server files (App ${SRCDS_APPID})..."
 log_debug "Install directory: /mnt/server"
+log_debug "SteamCMD directory: /mnt/server/steamcmd"
 
 ## Test network connectivity before attempting download
 log_debug "Testing network connectivity..."
-if ping -c 1 8.8.8.8 > /dev/null 2>&1; then
-    log_debug "Network connectivity OK (8.8.8.8)"
-elif ping -c 1 1.1.1.1 > /dev/null 2>&1; then
-    log_debug "Network connectivity OK (1.1.1.1)"
+
+# Enhanced network diagnostics in DEBUG mode
+if [ "${INSTALL_LOG}" = "DEBUG" ]; then
+    log_debug "Network interface information:"
+    ip addr show 2>/dev/null || ifconfig 2>/dev/null || log_debug "Cannot list network interfaces"
+    log_debug "Routing table:"
+    ip route show 2>/dev/null || route -n 2>/dev/null || log_debug "Cannot show routing table"
+    log_debug "DNS configuration:"
+    cat /etc/resolv.conf 2>/dev/null || log_debug "Cannot read DNS config"
+fi
+
+# Test HTTP connectivity (more reliable than ICMP ping which is often blocked)
+if curl -s --connect-timeout 5 -o /dev/null -w "%{http_code}" http://www.google.com 2>/dev/null | grep -q "200\|301\|302"; then
+    log_debug "Network connectivity OK (HTTP test successful)"
+elif curl -s --connect-timeout 5 -o /dev/null -w "%{http_code}" http://cloudflare.com 2>/dev/null | grep -q "200\|301\|302"; then
+    log_debug "Network connectivity OK (HTTP fallback successful)"
 else
     log_error "No network connectivity!"
-    log_info "The container cannot reach the internet."
+    log_info "The container cannot reach the internet via HTTP."
     log_info ""
+    
+    # Additional diagnostics in DEBUG mode
+    if [ "${INSTALL_LOG}" = "DEBUG" ]; then
+        log_info "Network Diagnostics:"
+        log_info "  Default Gateway: $(ip route show default 2>/dev/null | awk '{print $3}' || echo 'Unknown')"
+        log_info "  Container IP: $(hostname -i 2>/dev/null || echo 'Unknown')"
+        log_info "  DNS Servers: $(grep nameserver /etc/resolv.conf 2>/dev/null | awk '{print $2}' | tr '\n' ' ' || echo 'Unknown')"
+        log_info ""
+        log_info "Testing connectivity methods:"
+        log_info "  HTTP test: $(curl -s --connect-timeout 3 -o /dev/null -w "%{http_code}" http://www.google.com 2>&1 || echo 'Failed')"
+        log_info "  DNS test: $(nslookup google.com 8.8.8.8 2>&1 | grep -A1 'Name:' | tail -1 || echo 'Failed')"
+        log_info ""
+    fi
+    
     log_info "Troubleshooting steps:"
-    log_info "  1. Check Pterodactyl Wings network configuration"
+    log_info "  1. Check Pterodactyl Wings network configuration (/etc/pterodactyl/config.yml)"
     log_info "  2. Verify Docker network: docker network ls"
-    log_info "  3. Check firewall rules on the host"
-    log_info "  4. Test: docker run --rm alpine ping -c 1 8.8.8.8"
+    log_info "  3. Check Docker daemon config: /etc/docker/daemon.json"
+    log_info "     - Ensure 'iptables' is set to true"
+    log_info "  4. Test from host: docker run --rm alpine curl -s http://google.com"
+    log_info "  5. Check firewall rules and FORWARD policy: iptables -L FORWARD -n"
+    log_info "  6. Verify IP forwarding: cat /proc/sys/net/ipv4/ip_forward (should be 1)"
     log_info ""
     log_info "Common causes:"
-    log_info "  - Wings network_mode misconfiguration"
-    log_info "  - Docker bridge network issues"
-    log_info "  - Host firewall blocking container traffic"
-    log_info "  - DNS resolution problems"
+    log_info "  - Docker daemon.json has 'iptables': false (prevents NAT)"
+    log_info "  - UFW FORWARD policy blocking container traffic"
+    log_info "  - Docker bridge network not configured correctly"
+    log_info "  - Host firewall blocking container traffic (check UFW, firewalld)"
+    log_info "  - DNS resolution problems (check /etc/resolv.conf in container)"
+    log_info "  - SELinux blocking container networking (check: getenforce)"
     log_info "=========================================="
     exit 1
 fi
@@ -130,11 +165,73 @@ else
     log_debug "WARNING: Cannot ping Steam servers (may still work)"
 fi
 
+## Download and extract SteamCMD
+log_substep "Downloading SteamCMD..."
+cd /tmp
+curl -sSL -o steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
+tar -xzvf steamcmd.tar.gz -C /mnt/server/steamcmd
+cd /mnt/server/steamcmd
+log_debug "SteamCMD extracted to /mnt/server/steamcmd"
+
+## Prepare SteamCMD execution environment
+# Set permissions for root to execute steamcmd
+chown -R root:root /mnt
+
 log_substep "Starting SteamCMD download (this may take several minutes)..."
 
-su - steam -c "/home/steam/steamcmd/steamcmd.sh +force_install_dir /mnt/server +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} +app_update ${SRCDS_APPID} ${INSTALL_FLAGS} validate +quit"
+## SteamCMD download with retry logic (running as ROOT with HOME=/mnt/server)
+MAX_RETRIES=10
+RETRY_COUNT=0
+RETRY_DELAY=5  # Start with 5 seconds, increases with each attempt
 
-log_substep "Download completed"
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    
+    if [ $RETRY_COUNT -gt 1 ]; then
+        log_substep "Retry attempt $RETRY_COUNT of $MAX_RETRIES (waiting ${RETRY_DELAY}s before retry)..."
+        sleep $RETRY_DELAY
+        # Increase delay for next retry (exponential backoff: 5s, 10s, 15s, 20s, etc.)
+        RETRY_DELAY=$((RETRY_DELAY + 5))
+    else
+        log_substep "Attempt 1 of $MAX_RETRIES..."
+    fi
+    
+    # Run SteamCMD as ROOT with HOME=/mnt/server (not as steam user)
+    # This ensures SteamCMD can properly manage files in /mnt/server
+    if timeout 1800 /mnt/server/steamcmd/steamcmd.sh +force_install_dir /mnt/server +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} +app_update ${SRCDS_APPID} ${INSTALL_FLAGS} validate +quit; then
+        log_substep "Download completed successfully"
+        RETRY_COUNT=$MAX_RETRIES  # Exit loop
+    else
+        STEAMCMD_EXIT_CODE=$?
+        
+        if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+            if [ $STEAMCMD_EXIT_CODE -eq 124 ]; then
+                log_debug "SteamCMD timeout (exit code 124) - retrying..."
+            else
+                log_debug "SteamCMD failed with exit code $STEAMCMD_EXIT_CODE - retrying..."
+            fi
+        else
+            log_error "SteamCMD download failed after $MAX_RETRIES attempts!"
+            log_info "Last exit code: $STEAMCMD_EXIT_CODE"
+            log_info "=========================================="
+            log_info "Troubleshooting:"
+            log_info "  - Check Steam service status: https://steamstatus.com"
+            log_info "  - Verify Steam credentials are correct"
+            log_info "  - Ensure Steam account owns Arma Reforger"
+            log_info "  - Check network connectivity: curl -s https://steampowered.com | head -n 5"
+            log_info "  - Review detailed logs above for specific errors"
+            log_info "=========================================="
+            exit 1
+        fi
+    fi
+done
+
+## Set up Steam SDK libraries (required for server binary)
+log_substep "Configuring Steam SDK libraries..."
+mkdir -p /mnt/server/.steam/sdk32
+mkdir -p /mnt/server/.steam/sdk64
+cp -v /mnt/server/steamcmd/linux32/steamclient.so /mnt/server/.steam/sdk32/steamclient.so 2>/dev/null || log_debug "32-bit library not found (may be OK)"
+cp -v /mnt/server/steamcmd/linux64/steamclient.so /mnt/server/.steam/sdk64/steamclient.so 2>/dev/null || log_debug "64-bit library not found (may be OK)"
 
 ## Verify installation
 log_step "5/6" "Verifying installation..."
@@ -168,10 +265,6 @@ cat > /mnt/server/config.json << 'EOFCONFIG'
 	"bindPort": 2001,
 	"publicAddress": "0.0.0.0",
 	"publicPort": 2001,
-	"a2s": {
-		"address": "0.0.0.0",
-		"port": 17777
-	},
 	"rcon": {
 		"address": "0.0.0.0",
 		"port": 19998,
@@ -243,7 +336,7 @@ fi
 
 ## Generate startup script with informative logging
 echo "  -> Generating startup script..."
-cat > /mnt/server/startup.sh << 'EOFSTARTUP'
+cat > /mnt/server/armareforger-server.sh << 'EOFSTARTUP'
 #!/bin/bash
 # Arma Reforger Server - Startup Script
 # This script displays server configuration and starts the Arma Reforger server
@@ -251,6 +344,19 @@ cat > /mnt/server/startup.sh << 'EOFSTARTUP'
 echo "=========================================="
 echo "Arma Reforger Dedicated Server - Starting"
 echo "=========================================="
+echo ""
+
+# Diagnostic information
+echo "[Startup Diagnostics]"
+echo "  Current User:       $(whoami)"
+echo "  Working Directory:  $(pwd)"
+echo "  Script Location:    $0"
+echo "  Home Directory:     $HOME"
+echo ""
+
+# List files in current directory for verification
+echo "[Server Files in Working Directory]"
+ls -lh ArmaReforgerServer config.json armareforger-server.sh 2>/dev/null || echo "  WARNING: Some expected files not found"
 echo ""
 
 # Display server configuration
@@ -261,7 +367,8 @@ if [ -f "config.json" ]; then
     echo "  Max Players:    $(jq -r '.game.maxPlayers // "N/A"' config.json)"
     echo "  Bind IP:        ${SERVER_IP:-0.0.0.0}"
     echo "  Bind Port:      ${SERVER_PORT:-2001}"
-    echo "  A2S Port:       $(jq -r '.a2s.port // "N/A"' config.json)"
+    echo "  A2S IP:         ${SERVER_IP:-0.0.0.0}"
+    echo "  A2S Port:       ${A2S_PORT:-17777}"
     echo "  RCON Port:      $(jq -r '.rcon.port // "N/A"' config.json)"
     echo "  Crossplay:      $(jq -r '.game.crossPlatform // "N/A"' config.json)"
     echo "  BattlEye:       $(jq -r '.game.gameProperties.battlEye // "N/A"' config.json)"
@@ -294,16 +401,28 @@ echo "  Logs:           ./profile/console*.log"
 echo ""
 
 echo "=========================================="
-echo "Converting boolean values in config.json..."
+echo "Validating and fixing config.json format..."
+
+# Fix boolean values: convert string booleans to JSON booleans
 sed -i 's/"true"/true/g; s/"false"/false/g' config.json
+
+# Fix password fields: ensure they are always strings (not integers)
+# If a password field is empty or null, set it to empty string
+jq '.game.password = (.game.password | tostring) | 
+    .game.passwordAdmin = (.game.passwordAdmin | tostring) | 
+    .rcon.password = (.rcon.password | tostring)' config.json > config.json.tmp && mv config.json.tmp config.json
+
+echo "Config.json validated and fixed"
 echo "Starting server..."
 echo "=========================================="
 echo ""
 
 # Start the Arma Reforger server with all parameters
+# Network parameters (bind IP/port, A2S address/port) are now configured via config.json
+# and automatically applied by Pterodactyl's config.files parser on startup
 exec ./ArmaReforgerServer \
-    -bindIP "${SERVER_IP:-0.0.0.0}" \
-    -bindPort "${SERVER_PORT:-2001}" \    
+    -config ./config.json \
+    -profile ./profile \
     -logStats $((${LOG_INTERVAL}*1000)) \
     -maxFPS ${MAX_FPS} \
     -rpl-timeout-ms ${RPL_TIMEOUT} \
@@ -313,15 +432,24 @@ exec ./ArmaReforgerServer \
     -streamingBudget ${STREAMING_BUDGET} \
     -streamsDelta ${STREAMS_DELTA} \
     -keepNumOfLogs ${KEEP_NUM_LOGS}
-    -config ./config.json \
-    -profile ./profile \
 EOFSTARTUP
 
-chmod +x /mnt/server/startup.sh
-log_substep "Startup script created: startup.sh"
+chmod +x /mnt/server/armareforger-server.sh
+log_substep "Startup script created: armareforger-server.sh"
 
-## Fix permissions one more time
-log_debug "Setting final permissions..."
+## Verify startup script was created
+if [ ! -f "/mnt/server/armareforger-server.sh" ]; then
+    log_error "Startup script generation failed!"
+    log_info "The armareforger-server.sh file was not created."
+    log_info "==========================================="
+    exit 1
+fi
+
+log_debug "Startup script verified and executable"
+log_debug "Startup script size: $(du -h /mnt/server/armareforger-server.sh | cut -f1)"
+
+## Fix permissions: Set steam user as owner for runtime execution
+log_debug "Setting final permissions for steam user..."
 chown -R steam:steam /mnt/server
 
 log_info "=========================================="
@@ -329,7 +457,7 @@ log_info "Installation completed successfully!"
 log_info "=========================================="
 log_info "Summary:"
 log_info "  Server Binary: ArmaReforgerServer ($(du -h /mnt/server/ArmaReforgerServer | cut -f1))"
-log_info "  Startup Script: startup.sh"
+log_info "  Startup Script: armareforger-server.sh"
 log_info "  Config File: config.json (validated)"
 log_info "  Server Name: ${SERVER_NAME}"
 log_info "  Max Players: ${MAX_PLAYERS}"
@@ -338,6 +466,9 @@ log_info "=========================================="
 
 if [ "${INSTALL_LOG}" = "DEBUG" ]; then
     log_debug "Final directory listing:"
-    ls -lah /mnt/server/ | head -20
+    ls -lah /mnt/server/ | head -25
+    log_debug "========================================="
+    log_debug "Server binary location: $(which ArmaReforgerServer 2>/dev/null || echo 'Not in PATH')"
+    log_debug "Executable check: $(file /mnt/server/ArmaReforgerServer 2>/dev/null)"
     log_debug "========================================="
 fi
