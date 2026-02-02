@@ -2,336 +2,142 @@
 
 Production-ready egg for Arma Reforger Dedicated Server on Pterodactyl Panel.
 
-## ⚠️ CRITICAL REQUIREMENT: Steam Authentication
+## Requirements
 
-**Arma Reforger Dedicated Server REQUIRES Steam account authentication** - anonymous login will fail.
+- Docker Image: `fabriciojrsilva/steamcmd-eggs:latest`
+- Steam Account that owns Arma Reforger (anonymous login not supported)
+- Minimum 4GB RAM recommended
 
-### Before Installation:
+## Installation
 
-1. **Steam Account Required**: You need a Steam account that **owns Arma Reforger**
-2. **Configure Credentials**: Set these variables in Pterodactyl Panel before installation:
-   - `STEAM_USER` - Your Steam username (REQUIRED)
-   - `STEAM_PASS` - Your Steam password (REQUIRED)
-   - `STEAM_AUTH` - Steam Guard code (only if 2FA enabled)
+### 1. Import Egg
 
-3. **Steam Guard (2FA) Considerations**:
-   - **Recommended**: Temporarily disable Steam Guard during first installation
-   - **Alternative**: Provide current Steam Guard code in `STEAM_AUTH` variable
-   - The code expires quickly, so installation must complete before expiration
+1. Download `egg-pterodactyl-arma-reforger.json`
+2. In Pterodactyl Panel: Admin > Nests > Import Egg
+3. Upload the JSON file
 
-### Expected Error Without Authentication:
+### 2. Configure Steam Credentials
+
+Before installation, set these variables in the Panel:
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `STEAM_USER` | Steam username | Yes |
+| `STEAM_PASS` | Steam password | Yes |
+| `STEAM_AUTH` | Steam Guard code | Only if 2FA enabled |
+
+### 3. Create Server
+
+1. Create new server with the imported egg
+2. Set Steam credentials
+3. Click Install/Reinstall
+
+## Execution Flow
 
 ```
-ERROR! Failed to install app '1874900' (Missing configuration)
+Phase 1: Installation (runs as ROOT)
+├── Configure Steam credentials
+├── Create directories (steamcmd, profile, tmp)
+├── Download game via SteamCMD (App ID 1874900)
+├── Generate config.json template
+├── Generate armareforger-server.sh startup script
+└── Set permissions for container user
+
+Phase 2: Runtime (runs as container)
+├── Check AUTO_UPDATE variable
+├── If enabled: update via SteamCMD
+├── Execute startup command
+└── Server runs
 ```
 
-This error indicates Steam credentials are missing or invalid.
+## Configuration Variables
 
-## Installation and Execution
+### Server Settings
 
-### Phase 1: Installation
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SERVER_NAME` | Server name in browser | Arma Reforger Server |
+| `MAX_PLAYERS` | Maximum players | 64 |
+| `SCENARIO_ID` | Mission scenario | Campaign |
 
-Container: `fabriciojrsilva/steamcmd-eggs:installer`
+### Network
 
-The installation process performs the following operations:
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `A2S_PORT` | Steam query port | 1770 |
+| `RCON_PORT` | RCON admin port | 19992 |
+| `RCON_PASSWORD` | RCON password | admin123 |
 
-1. Dependency verification (jq for JSON validation)
-2. Steam credentials configuration (anonymous or authenticated)
-3. Directory structure creation (profile/, tmp/)
-4. Server files download via SteamCMD (App ID 1874900)
-5. Configuration file generation from template
-6. Variable substitution using sed
-7. JSON validation with jq
-8. Permission adjustment for steam user
-9. Startup script generation with logging
+### Features
 
-#### Installation Logging Levels
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `AUTO_UPDATE` | Update on every start | 0 (disabled) |
+| `CROSS_PLATFORM` | Enable crossplay | true |
+| `BATTLEYE` | Enable BattlEye | false |
 
-The installation script supports two logging levels controlled by the `INSTALL_LOG` variable:
+## Auto-Update
 
-**INFO (Default)** - Essential progress messages only:
-```
-==========================================
-Arma Reforger Server - Installation
-Logging Level: INFO
-==========================================
-[1/6] Checking dependencies...
-[2/6] Configuring installation parameters...
-  -> Using Steam account: myuser
-[3/6] Creating server directories...
-[4/6] Downloading Arma Reforger Server files (App 1874900)...
-  -> Starting SteamCMD download (this may take several minutes)...
-  -> Download completed
-[5/6] Verifying installation...
-  -> ArmaReforgerServer found (156M)
-[6/6] Generating default configuration...
-  -> Validating JSON structure...
-  -> config.json is valid ✓
-  -> Startup script created: startup.sh
-==========================================
-Installation completed successfully!
-==========================================
-Summary:
-  Server Binary: ArmaReforgerServer (156M)
-  Startup Script: startup.sh
-  Config File: config.json (validated)
-  Server Name: My Server
-  Max Players: 128
-  Install Size: 2.1G
-==========================================
-```
+Enable automatic updates on server start:
 
-**DEBUG** - Verbose output with all commands and details:
-```
-==========================================
-Arma Reforger Server - Installation
-Logging Level: DEBUG
-==========================================
-  [DEBUG] Working directory: /mnt/server
-  [DEBUG] User: root
-  [DEBUG] App ID: 1874900
-[1/6] Checking dependencies...
-  [DEBUG] jq available: /usr/bin/jq
-[2/6] Configuring installation parameters...
-  [DEBUG] Server name: My Server
-  [DEBUG] App ID: 1874900
-  -> Using Steam account: myuser
-[3/6] Creating server directories...
-  [DEBUG] Directories created: profile, tmp
-  [DEBUG] Setting permissions for steam user...
-[4/6] Downloading Arma Reforger Server files (App 1874900)...
-  [DEBUG] Install directory: /mnt/server
-  [DEBUG] Testing network connectivity...
-  [DEBUG] Network connectivity OK (8.8.8.8)
-  [DEBUG] Testing Steam connectivity...
-  [DEBUG] Steam servers reachable
-+ su - steam -c '/home/steam/steamcmd/steamcmd.sh +force_install_dir /mnt/server +login...'
-  -> Starting SteamCMD download (this may take several minutes)...
-  [... SteamCMD output ...]
-  -> Download completed
-[5/6] Verifying installation...
-  -> ArmaReforgerServer found (156M)
-[6/6] Generating default configuration...
-  [DEBUG] Configuration template generated
-  [DEBUG] Placeholders replaced with actual values
-  -> Validating JSON structure...
-  -> config.json is valid ✓
-  -> Startup script created: startup.sh
-  [DEBUG] Setting final permissions...
-==========================================
-Installation completed successfully!
-==========================================
-Summary:
-  Server Binary: ArmaReforgerServer (156M)
-  Startup Script: startup.sh
-  Config File: config.json (validated)
-  Server Name: My Server
-  Max Players: 128
-  Install Size: 2.1G
-==========================================
-  [DEBUG] Final directory listing:
-  [... directory contents ...]
-==========================================
-```
+1. Set `AUTO_UPDATE=1` in Panel variables
+2. Server will check for updates before starting
+3. Uses existing Steam credentials
 
-**When to use DEBUG mode:**
-- Troubleshooting installation failures
-- Verifying Steam credentials
-- Diagnosing network connectivity issues
-- Understanding exact script execution flow
-- Debugging configuration generation problems
+## Files Generated
 
-### Phase 2: Runtime
+After installation, these files are created in `/home/container`:
 
-Container: `cm2network/steamcmd:latest`
+| File | Purpose |
+|------|---------|
+| `ArmaReforgerServer` | Game server binary |
+| `config.json` | Server configuration |
+| `armareforger-server.sh` | Startup script |
+| `profile/` | Server profiles and logs |
 
-The server uses a dedicated startup script (`startup.sh`) that:
+## Debugging
 
-1. **Displays server configuration** - Shows all important settings before startup
-2. **Logs operational parameters** - Network tuning, performance settings, directories
-3. **Converts boolean values** - Transforms JSON string booleans to proper booleans
-4. **Starts the server** - Executes ArmaReforgerServer with all configured parameters
+### Enable Debug Logging
 
-Startup command:
+Set `INSTALL_LOG=DEBUG` before reinstalling for verbose output.
+
+### Common Issues
+
+**"Missing configuration" error:**
+- Verify Steam credentials are set
+- Ensure account owns Arma Reforger
+
+**Server not starting:**
+- Check if `ArmaReforgerServer` exists
+- Verify file permissions
+
+**Config not updating:**
+- Panel variables are applied to `config.json` on each start
+- Check startup logs for parsing errors
+
+## Development
+
+### Modify Installation Script
+
 ```bash
-bash startup.sh
+cd eggs/arma-reforger
+
+# 1. Edit the script
+nano installation-script.sh
+
+# 2. Sync to JSON
+python3 sync-script-to-json.py
+
+# 3. Validate
+python3 validate-egg.py
 ```
 
-The startup script displays:
-- Server name, scenario, max players
-- Bind IP/Port, A2S, RCON configuration
-- Crossplay, BattlEye, visibility status
-- Network tuning parameters (RPL timeout, NDS, streaming budgets)
-- Performance settings (FPS limit, log intervals)
-- Directory locations
+### Add New Variable
 
-**Example startup output:**
-```
-==========================================
-Arma Reforger Dedicated Server - Starting
-==========================================
+1. Add to `variables[]` in egg JSON
+2. If needed in config.json, add to `config.files` parser
+3. Run `validate-egg.py` to check
 
-[Server Configuration]
-  Server Name:    My Arma Reforger Server
-  Scenario:       {ECC61978EDCC2B5A}Missions/23_Campaign.conf
-  Max Players:    128
-  Bind IP:        192.168.1.100
-  Bind Port:      2001
-  A2S Port:       17777
-  RCON Port:      19998
-  Crossplay:      true
-  BattlEye:       false
-  Visible:        true
+## License
 
-[Network Tuning]
-  RPL Timeout:       10000ms
-  NDS Diameter:      1
-  Network Resolution: 250m
-  Staggering Budget: 2500
-  Streaming Budget:  400
-  Streams Delta:     250
-
-[Performance]
-  Max FPS:        120
-  Log Interval:   1000s
-  Keep Logs:      10
-
-[Directories]
-  Config:         ./config.json
-  Profile:        ./profile/
-  Logs:           ./profile/console*.log
-
-==========================================
-Converting boolean values in config.json...
-Starting server...
-==========================================
-```
-
-## Custom Docker Image
-
-Location: `../docker/arma-reforger/Dockerfile`
-
-Includes pre-installed dependencies:
-- jq (JSON validation)
-- curl, ca-certificates (mod downloads)
-- lib32gcc-s1, lib32stdc++6 (32-bit compatibility)
-- iputils-ping (network diagnostics)
-
-Build and publish:
-```bash
-cd docker/arma-reforger
-docker build -t fabriciojrsilva/steamcmd-eggs:installer .
-docker push fabriciojrsilva/steamcmd-eggs:installer
-```
-
-## Development Workflow
-
-### Modifying the Installation Script
-
-1. Edit `installation-script.sh` directly
-2. Synchronize changes to egg JSON:
-   ```bash
-   python sync-script-to-json.py
-   ```
-3. Validate JSON structure:
-   ```bash
-   python -c "import json; json.load(open('egg-pterodactyl-arma-reforger.json'))"
-   ```
-
-### Adding Configuration Variables
-
-Refer to `.github/copilot-instructions.md` for detailed instructions.
-
-## Troubleshooting
-
-### Installation Fails with "ERROR! Failed to install app '1874900' (Missing configuration)"
-
-**Cause**: Arma Reforger requires Steam account authentication.
-
-**Solution**:
-1. Configure Steam credentials in Pterodactyl Panel:
-   - Navigate to server → Startup tab
-   - Set `STEAM_USER` to your Steam username
-   - Set `STEAM_PASS` to your Steam password
-   - If Steam Guard enabled, set `STEAM_AUTH` to current code
-2. Ensure the Steam account owns Arma Reforger
-3. Retry installation
-
-**Alternative Solutions**:
-- Temporarily disable Steam Guard for initial installation
-- Use a dedicated server hosting account if available
-- Contact Bohemia Interactive for dedicated server licensing
-
-### Installation Errors
-
-**Error: `/mnt/install/install.sh: Permission denied`**
-
-This error typically indicates an issue with the egg import or Pterodactyl configuration:
-
-1. **Re-import the egg**: Delete the old egg and import the latest JSON file
-2. **Verify Docker image access**: Ensure Pterodactyl can pull `fabriciojrsilva/steamcmd-eggs:installer`
-3. **Check Pterodactyl logs**: View daemon logs for detailed error messages
-   ```bash
-   # On Pterodactyl host
-   docker logs pterodactyl_wings -f
-   ```
-4. **Verify entrypoint**: Ensure egg JSON has `"entrypoint": "/bin/bash"`
-
-**Debugging Installation Process**
-
-The installation script includes two logging levels for different troubleshooting needs:
-
-1. **Enable DEBUG mode** for detailed output:
-   - Navigate to server → Startup tab in Pterodactyl Panel
-   - Set `INSTALL_LOG` variable to `DEBUG`
-   - Reinstall server to see verbose output with all commands executed
-   - Shows: Command traces, network tests, file operations, validation details
-
-2. **Use INFO mode** (default) for clean progress messages:
-   - Shows only essential steps and completion status
-   - Ideal for production installations
-   - Reduces log noise while maintaining visibility
-
-Each installation step shows:
-- Phase number and description (1/6, 2/6, etc.)
-- Essential progress indicators
-- Success/failure confirmations
-- Error messages with troubleshooting hints
-- Final summary with server configuration
-
-To view full installation logs:
-1. Navigate to server console in Pterodactyl Panel
-2. Click "Install" or "Reinstall"
-3. Watch real-time output for diagnostic information
-
-**Common Issues**
-
-- **SteamCMD fails**: Check network connectivity, Steam service status
-- **JSON validation fails**: Review config.json content in debug output
-- **Executable not found**: Verify App ID 1874900, check disk space
-- **Permission errors during install**: Container runs as root during install phase, this is expected
-
-### Runtime Errors
-
-**Error: Server won't start**
-
-1. Check config.json validity in file manager
-2. Verify all boolean values are unquoted (true/false not "true"/"false")
-3. Review startup command variables in egg configuration
-
-**Error: Cannot find logs**
-
-Logs are located at `profile/console*.log` - ensure this directory exists and has proper permissions.
-
-## Deprecated Files
-
-The following files are not used by Pterodactyl:
-- `docker/arma-reforger/entrypoint.sh` - Egg JSON controls the entrypoint directly
-
-## Technical Notes
-
-- Pterodactyl Panel serves as the single source of truth for all server configurations
-- Configuration file is regenerated on every installation to ensure consistency
-- JSON validation prevents server crash loops from malformed configuration
-- Boolean environment variables are converted from strings at startup
-- Installation script runs with debugging enabled (`set -x`) for troubleshooting
+MIT License

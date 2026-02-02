@@ -1,64 +1,116 @@
 # Pterodactyl Eggs
 
-![License](https://img.shields.io/github/license/SEU_USUARIO/pterodactyl.eggs)
+![License](https://img.shields.io/github/license/fabriciojrsilva/pterodactyl.eggs)
 ![Pterodactyl](https://img.shields.io/badge/Pterodactyl-v1.0+-blue)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 
-Production-ready Pterodactyl Panel eggs for game server deployment. This repository provides validated, enterprise-grade server configurations with enhanced reliability features.
+Production-ready Pterodactyl Panel eggs for automated game server deployment. Features unified Docker images, automatic updates, and validated configurations.
 
-## Available Server Eggs
+## Available Eggs
 
-| Game | Engine | Status | Key Features |
-| :--- | :--- | :--- | :--- |
-| Arma Reforger | Enfusion | Stable | JSON validation, automated configuration, optimized installation |
+| Game | Status | Features |
+|------|--------|----------|
+| [Arma Reforger](./eggs/arma-reforger/) | Stable | A2S, RCON, Crossplay, Auto-Update |
 
-## Arma Reforger Server
+## Quick Start
 
-Location: [`/eggs/arma-reforger/`](./eggs/arma-reforger/)
+### 1. Import the Egg
 
-This egg includes several improvements over standard configurations:
+1. Download `egg-pterodactyl-arma-reforger.json` from [eggs/arma-reforger/](./eggs/arma-reforger/)
+2. In Pterodactyl Panel: Admin > Nests > Import Egg
+3. Upload the JSON file
 
-**Configuration Management**
-- JSON validation using `jq` prevents malformed configurations and crash loops
-- Idempotent configuration regeneration ensures consistency across reinstalls
-- Panel serves as single source of truth for all server settings
+### 2. Create Server
 
-**Installation Process**
-- Custom Docker image with pre-installed dependencies (`jq`, `curl`, 32-bit libraries)
-- Dual-container strategy: root privileges for installation, unprivileged runtime
-- Automated validation at every step
+1. Create new server using the imported egg
+2. Configure Steam credentials (required for Arma Reforger)
+3. Start the server
 
-**Platform Support**
-- Native crossplay configuration for PC, Xbox, and PlayStation platforms
-- A2S query support for server browser integration
-- RCON remote administration capability
+## Docker Image
 
-### Installation Instructions
+All eggs use a unified Docker image that works for both installation and runtime:
 
-1. Download `egg-pterodactyl-arma-reforger.json` from the repository
-2. Navigate to Pterodactyl Panel Admin area
-3. Select Nests, then Import Egg
-4. Upload the JSON file and configure nest settings
-5. Create new server instance using the imported egg
+```
+fabriciojrsilva/steamcmd-eggs:latest
+```
 
-### System Requirements
+### Features
 
-- Docker image: `fabriciojrsilva/steamcmd-eggs:installer` (installation) / `cm2network/steamcmd:latest` (runtime)
-- Minimum RAM: 4GB recommended for stable operation
-- Network: Ports configurable via panel (default: game 2001, A2S 17777, RCON 19998)
+- **Unified Image**: Single image for installation and runtime
+- **Auto-Update**: Set `AUTO_UPDATE=1` to update on every start
+- **Pre-installed Tools**: SteamCMD, jq, curl ready to use
+- **Non-root Runtime**: Runs as unprivileged user for security
+- **Tini Init**: Proper signal handling for graceful shutdown
+
+### Build Locally
+
+```bash
+./scripts/build-docker.sh
+```
+
+## Project Structure
+
+```
+pterodactyl.eggs/
+├── docker/
+│   └── steamcmd/           # Docker image source
+│       ├── Dockerfile
+│       ├── entrypoint.sh
+│       └── README.md
+├── eggs/
+│   └── arma-reforger/      # Arma Reforger egg
+│       ├── egg-pterodactyl-arma-reforger.json
+│       ├── installation-script.sh
+│       └── README.md
+├── scripts/
+│   └── build-docker.sh     # Build Docker image
+└── README.md
+```
+
+## Execution Flow
+
+```
+1. Docker Image Build
+   └── Creates fabriciojrsilva/steamcmd-eggs:latest
+
+2. Server Installation (Pterodactyl)
+   └── Downloads game via SteamCMD
+   └── Generates config.json and startup script
+   └── Sets file permissions
+
+3. Server Runtime
+   └── Optional: Auto-update via SteamCMD
+   └── Executes startup command
+   └── Game server runs
+```
+
+## Configuration
+
+All server settings are configurable through the Pterodactyl Panel UI. The egg automatically:
+
+- Substitutes variables into `config.json`
+- Converts string booleans to JSON booleans
+- Ensures proper field types for passwords
 
 ## Contributing
 
-Contributions are accepted for script improvements, new configuration variables, and additional game server eggs.
-
-Standard workflow:
 1. Fork the repository
 2. Create feature branch
-3. Submit pull request with detailed description
+3. For installation script changes:
+   ```bash
+   cd eggs/arma-reforger
+   # Edit installation-script.sh
+   python3 sync-script-to-json.py
+   python3 validate-egg.py
+   ```
+4. Submit pull request
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for complete terms.
+MIT License - see [LICENSE](LICENSE)
 
 ---
 
-Maintained by Fabricio Junior
+Maintained by Fabricio Junior Silva
+
+Discord: `mindisgurpe__`

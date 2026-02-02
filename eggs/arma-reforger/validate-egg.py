@@ -75,10 +75,24 @@ def validate_egg():
     if unused_vars:
         for var in sorted(unused_vars):
             # Some variables are used directly in startup or config, not as placeholders
-            if var not in ['SRCDS_APPID', 'INSTALL_LOG', 'STEAM_USER', 'STEAM_PASS', 'STEAM_AUTH', 
-                          'AUTO_UPDATE', 'VALIDATE_FILES', 'MAX_FPS', 'LOG_INTERVAL', 'RPL_TIMEOUT',
-                          'NDS', 'NWK_RESOLUTION', 'STAGGERING_BUDGET', 'STREAMING_BUDGET', 
-                          'STREAMS_DELTA', 'KEEP_NUM_LOGS', 'INSTALL_FLAGS']:
+            # These are either used in config.files parser or directly in entrypoint/startup
+            config_vars = [
+                # Steam/Installation
+                'SRCDS_APPID', 'INSTALL_LOG', 'STEAM_USER', 'STEAM_PASS', 'STEAM_AUTH', 
+                'AUTO_UPDATE', 'VALIDATE_FILES', 'INSTALL_FLAGS',
+                # Startup command parameters
+                'MAX_FPS', 'LOG_INTERVAL', 'RPL_TIMEOUT', 'NDS', 'NWK_RESOLUTION', 
+                'STAGGERING_BUDGET', 'STREAMING_BUDGET', 'STREAMS_DELTA', 'KEEP_NUM_LOGS',
+                # config.files parser variables (populated directly into config.json by Pterodactyl)
+                'SERVER_NAME', 'SERVER_PASS', 'ADMIN_PASS', 'MAX_PLAYERS', 'SCENARIO_ID', 'VISIBLE',
+                'PUBLIC_IP', 'A2S_PORT', 'A2S_ADDRESS', 'RCON_PORT', 'RCON_ADDRESS', 'RCON_PASSWORD',
+                'CROSS_PLATFORM', 'BATTLEYE', 'DISABLE_THIRD', 'MODS_REQUIRED',
+                'MAX_VIEW_DISTANCE', 'MIN_GRASS_DISTANCE', 'NETWORK_VIEW_DISTANCE',
+                'VON_DISABLE_UI', 'VON_DISABLE_DIRECT_UI', 'VON_CROSS_FACTION',
+                'AI_LIMIT', 'DISABLE_AI', 'DISABLE_SHUTDOWN', 'QUEUE_MAX_SIZE',
+                'PLAYER_SAVE_TIME', 'SLOT_RESERVATION_TIMEOUT'
+            ]
+            if var not in config_vars:
                 warnings.append(f"Variable {var} defined but not used as placeholder in installation script")
     
     # Check for missing variables for placeholders
