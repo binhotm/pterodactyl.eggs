@@ -416,11 +416,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-.github/*
-eggs/arma-reforger/armarserver_config.json
-eggs/arma-reforger/armaconfig.json
 
-# Server config files with sensitive data
+# Server config files with sensitive data (passwords, credentials)
 eggs/arma-reforger/armaconfig.json
 eggs/arma-reforger/armarserver_config.json
 **/config.json
