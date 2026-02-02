@@ -1,29 +1,34 @@
 #!/bin/bash
-
-# Build script for Arma Reforger Docker image
-# This script builds the custom Docker image for Arma Reforger servers
+############################################################
+# Build Script - Pterodactyl Eggs Docker Image
+# Builds the unified SteamCMD image for installation and runtime
+############################################################
 
 set -e
 
-# Change to the project root directory
 cd "$(dirname "$0")/.."
 
-# Define variables
 IMAGE_NAME="fabriciojrsilva/steamcmd-eggs"
-IMAGE_TAG="installer"
-DOCKER_DIR="docker/arma-reforger"
+DOCKER_DIR="docker/steamcmd"
 
-echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
-echo "Using Dockerfile from: ${DOCKER_DIR}"
+echo "=========================================="
+echo "Pterodactyl Eggs - Docker Build"
+echo "=========================================="
+echo ""
 
-# Build the Docker image
+# Build unified image
+echo "Building unified image..."
 docker build \
-    -t "${IMAGE_NAME}:${IMAGE_TAG}" \
+    -t "${IMAGE_NAME}:latest" \
+    -t "${IMAGE_NAME}:arma-reforger" \
     -f "${DOCKER_DIR}/Dockerfile" \
     "${DOCKER_DIR}"
 
-echo "Build complete!"
-echo "Image: ${IMAGE_NAME}:${IMAGE_TAG}"
 echo ""
-echo "To push to registry:"
-echo "  docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+echo "Build complete!"
+echo ""
+echo "Image: ${IMAGE_NAME}:latest"
+echo ""
+echo "To push to Docker Hub:"
+echo "  docker push ${IMAGE_NAME}:latest"
+echo "  docker push ${IMAGE_NAME}:arma-reforger"
