@@ -105,7 +105,7 @@ cat > /mnt/server/config.json << 'EOFCONFIG'
 	"publicPort": 2001,
 	"a2s": {
 		"address": "0.0.0.0",
-		"port": 1770
+		"port": 17770
 	},
 	"rcon": {
 		"address": "0.0.0.0",
@@ -197,7 +197,9 @@ exec ./ArmaReforgerServer \
     -staggeringBudget ${STAGGERING_BUDGET:-100} \
     -streamingBudget ${STREAMING_BUDGET:-10000} \
     -streamsDelta ${STREAMS_DELTA:-50} \
-    -keepNumOfLogs ${KEEP_NUM_LOGS:-10}
+    -keepNumOfLogs ${KEEP_NUM_LOGS:-10} \
+    -autoreload 10 \
+    -autoshutdown
 EOFSTARTUP
 
 chmod +x /mnt/server/armareforger-server.sh

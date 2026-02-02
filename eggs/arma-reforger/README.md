@@ -5,7 +5,6 @@ Production-ready egg for Arma Reforger Dedicated Server on Pterodactyl Panel.
 ## Requirements
 
 - Docker Image: `fabriciojrsilva/steamcmd-eggs:latest`
-- Steam Account that owns Arma Reforger (anonymous login not supported)
 - Minimum 4GB RAM recommended
 
 ## Installation
@@ -16,21 +15,12 @@ Production-ready egg for Arma Reforger Dedicated Server on Pterodactyl Panel.
 2. In Pterodactyl Panel: Admin > Nests > Import Egg
 3. Upload the JSON file
 
-### 2. Configure Steam Credentials
-
-Before installation, set these variables in the Panel:
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `STEAM_USER` | Steam username | Yes |
-| `STEAM_PASS` | Steam password | Yes |
-| `STEAM_AUTH` | Steam Guard code | Only if 2FA enabled |
-
-### 3. Create Server
+### 2. Create Server
 
 1. Create new server with the imported egg
-2. Set Steam credentials
-3. Click Install/Reinstall
+2. Click Install/Reinstall
+
+> **Note:** Anonymous Steam login is used by default. If you need to use a Steam account (e.g., for beta branches), configure `STEAM_USER` and `STEAM_PASS` in the Startup tab.
 
 ## Execution Flow
 
