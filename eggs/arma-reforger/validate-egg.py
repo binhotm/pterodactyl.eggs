@@ -101,14 +101,14 @@ def validate_egg():
     
     # Validate startup command
     startup = egg.get('startup', '')
-    if startup.startswith('bash startup.sh') or startup.startswith('bash arma-refor-server.sh'):
-        print(f"✅ Startup command: {startup[:50]}{'...' if len(startup) > 50 else ''}")
+    if 'armareforger-server.sh' in startup or 'startup.sh' in startup:
+        print(f"✅ Startup command: {startup[:60]}{'...' if len(startup) > 60 else ''}")
     else:
         warnings.append(f"Unusual startup command: {startup}")
     
-    # Check if installation script generates startup.sh or arma-refor-server.sh
-    if 'cat > /mnt/server/startup.sh' in script or 'cat > /mnt/server/arma-refor-server.sh' in script:
-        script_name = 'arma-refor-server.sh' if 'arma-refor-server.sh' in script else 'startup.sh'
+    # Check if installation script generates startup.sh or armareforger-server.sh
+    if 'cat > /mnt/server/startup.sh' in script or 'cat > /mnt/server/armareforger-server.sh' in script:
+        script_name = 'armareforger-server.sh' if 'armareforger-server.sh' in script else 'startup.sh'
         print(f"✅ Installation script generates {script_name}")
     else:
         errors.append("Installation script does not generate startup script")

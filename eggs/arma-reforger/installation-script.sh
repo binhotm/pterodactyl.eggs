@@ -232,8 +232,6 @@ mkdir -p /mnt/server/.steam/sdk32
 mkdir -p /mnt/server/.steam/sdk64
 cp -v /mnt/server/steamcmd/linux32/steamclient.so /mnt/server/.steam/sdk32/steamclient.so 2>/dev/null || log_debug "32-bit library not found (may be OK)"
 cp -v /mnt/server/steamcmd/linux64/steamclient.so /mnt/server/.steam/sdk64/steamclient.so 2>/dev/null || log_debug "64-bit library not found (may be OK)"
-
-## Verify installation
 log_step "5/6" "Verifying installation..."
 
 if [ ! -f "/mnt/server/ArmaReforgerServer" ]; then
@@ -265,6 +263,10 @@ cat > /mnt/server/config.json << 'EOFCONFIG'
 	"bindPort": 2001,
 	"publicAddress": "0.0.0.0",
 	"publicPort": 2001,
+	"a2s": {
+		"address": "0.0.0.0",
+		"port": 1770
+	},
 	"rcon": {
 		"address": "0.0.0.0",
 		"port": 19998,
@@ -300,12 +302,10 @@ cat > /mnt/server/config.json << 'EOFCONFIG'
 		"aiLimit": -1,
 		"disableAI": false,
 		"disableCrashReporter": false,
-		"disableNavmeshStreaming": [],
-		"disableServerShutdown": true,
+		"disableServerShutdown": false,
 		"joinQueue": {
 			"maxSize": 30
 		},
-		"lobbyPlayerSynchronise": true,
 		"playerSaveTime": 120,
 		"slotReservationTimeout": 60
 	}
@@ -448,9 +448,19 @@ fi
 log_debug "Startup script verified and executable"
 log_debug "Startup script size: $(du -h /mnt/server/armareforger-server.sh | cut -f1)"
 
-## Fix permissions: Set steam user as owner for runtime execution
-log_debug "Setting final permissions for steam user..."
-chown -R steam:steam /mnt/server
+## Fix permissions: Set correct user as owner for runtime execution
+## Detecta qual usuário usar (container para nova imagem, steam para legada)
+log_debug "Setting final permissions for runtime user..."
+if id "container" &>/dev/null; then
+    RUNTIME_USER="container"
+elif id "steam" &>/dev/null; then
+    RUNTIME_USER="steam"
+else
+    # Fallback: usa UID 1000 que é padrão do Pterodactyl
+    RUNTIME_USER="1000"
+fi
+log_debug "Runtime user: ${RUNTIME_USER}"
+chown -R ${RUNTIME_USER}:${RUNTIME_USER} /mnt/server
 
 log_info "=========================================="
 log_info "Installation completed successfully!"
