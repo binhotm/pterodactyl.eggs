@@ -418,3 +418,9 @@ FodyWeavers.xsd
 *.msp
 .github/*
 eggs/arma-reforger/armarserver_config.json
+eggs/arma-reforger/armaconfig.json
+
+# Server config files with sensitive data
+eggs/arma-reforger/armaconfig.json
+eggs/arma-reforger/armarserver_config.json
+**/config.json
