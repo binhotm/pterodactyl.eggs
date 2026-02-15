@@ -56,9 +56,20 @@ else
     echo -e "Auto-update disabled (AUTO_UPDATE=0). Starting server..."
 fi
 
+# ==========================================
+# INJEÇÃO DO JEMALLOC (SAS BR Otimização)
+# ==========================================
+JEMALLOC_PATH="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2"
+if [ -f "$JEMALLOC_PATH" ]; then
+    printf "\033[1m\033[32m[SAS Otimização] Injetando jemalloc para gestão de memória avançada...\033[0m\n"
+    export LD_PRELOAD="$JEMALLOC_PATH"
+else
+    printf "\033[1m\033[31m[SAS Aviso] libjemalloc.so.2 não encontrado. Rodando com glibc padrão.\033[0m\n"
+fi
+
 # Display the command we're running in the output, and then execute it
 printf "\033[1m\033[33mcontainer@pterodactyl~ \033[0m%s\n" "$PARSED"
 
 # Execute the startup command
 # shellcheck disable=SC2086
-exec env ${PARSED}
+exec env LD_PRELOAD="${LD_PRELOAD}" ${PARSED}
