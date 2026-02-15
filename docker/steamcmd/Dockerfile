@@ -96,6 +96,10 @@ RUN         dpkg --add-architecture i386 \
                 # Process Management
                 #
                 procps \
+                #
+                # Otimizacao de Memoria (SAS BR)
+                #
+                libjemalloc2 \
             #
             # Configure UTF-8 locale
             #
