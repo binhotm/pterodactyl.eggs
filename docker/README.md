@@ -6,8 +6,10 @@ This directory contains Docker image sources for Pterodactyl Panel eggs.
 
 This project uses **two separate Docker images** following the official Pterodactyl architecture:
 
-1. **Installer Image** - Used during the installation phase to download game files via SteamCMD
+1. **Installer Image** - Used during installation to download game files via SteamCMD
 2. **Runtime Image** - Used to execute and run the game server with auto-update support
+
+Both images are based on Debian Bookworm Slim for stability and minimal size.
 
 ## Images
 
@@ -28,11 +30,18 @@ This project uses **two separate Docker images** following the official Pterodac
 **Usage Flow:**
 ```
 1. Pterodactyl creates container from installer image
-2. Mounts /mnt/install with installation script
+2. Mounts volumes:
+   - /mnt/install - Installation script from egg JSON
+   - /mnt/server - Server files destination
 3. Executes: /bin/bash /mnt/install/install.sh
-4. SteamCMD downloads game files to /mnt/server
-5. Installation script generates config.json and startup scripts
-6. Container is destroyed
+4. Installation script:
+   - Downloads SteamCMD from Steam CDN
+   - Runs SteamCMD with game App ID
+   - Installs Steam SDK libraries (32/64-bit)
+   - Generates config.json template
+   - Generates startup script
+   - Sets permissions for container user
+5. Container destroyed after installation
 ```
 
 ### steamcmd/ - Runtime Image
@@ -40,31 +49,32 @@ This project uses **two separate Docker images** following the official Pterodac
 **Purpose:** Execute and run game servers with automatic updates.
 
 **Image Tags:** 
-- `fabriciojrsilva/steamcmd-eggs:latest` (recommended for new servers)
-- `fabriciojrsilva/steamcmd-eggs:arma-reforger` (version-specific tag)
+- `fabriciojrsilva/steamcmd-eggs:latest` (recommended)
+- `fabriciojrsilva/steamcmd-eggs:arma-reforger` (game-specific tag)
 
 **Features:**
 - Optimized for runtime performance
 - Includes entrypoint script for STARTUP command processing
 - Auto-update support via SteamCMD (controlled by `AUTO_UPDATE` variable)
 - Non-privileged user: `container` (UID 1000)
-- Includes network tools for diagnostics
+- Includes networking tools for diagnostics and server operations
+- Memory optimization with jemalloc
 - Base: `debian:bookworm-slim`
 
 **Usage Flow:**
 ```
 1. Pterodactyl creates container from runtime image
 2. Mounts server files to /home/container
-3. Entrypoint processes STARTUP environment variable
-4. Optional: Auto-update via SteamCMD
-5. Executes startup command (e.g., bash armareforger-server.sh)
-6. Game server runs
+3. Entrypoint processes STARTUP environment variable:
+   - Converts Pterodactyl template syntax: {{VAR}} → ${VAR}
+   - Optional: Run auto-update via SteamCMD (if AUTO_UPDATE=1)
+4. Executes startup command (e.g., bash armareforger-server.sh)
+5. Game server runs until stopped or crashes
 ```
 
 **Entrypoint Features:**
-- Converts Pterodactyl variables: `{{VAR}}` → `${VAR}`
-- Handles `STARTUP` command execution
-- Auto-update support (set `AUTO_UPDATE=1`)
+- Template variable conversion: `{{VAR}}` → `${VAR}`
+- Automatic command execution
 - SteamCMD integration for game updates
 
 ## Building Images
@@ -139,9 +149,9 @@ Both images include:
 
 - [installer/README.md](installer/README.md) - Installation image details
 - [steamcmd/README.md](steamcmd/README.md) - Runtime image details
-- [../eggs/arma-reforger/README.md](../eggs/arma-reforger/README.md) - Egg configuration details
+- [../eggs/arma-reforger/README.md](../eggs/arma-reforger/README.md) - Egg configuration
 
 ## Version History
 
-- **v2.0** - Separated installer and runtime images, refactored installation script
-- **v1.0** - Initial unified image
+- **v2.0.0** (February 2026) - Two-image architecture with separate installer and runtime images
+- **v1.0.0** (Initial release) - First version with unified approach
