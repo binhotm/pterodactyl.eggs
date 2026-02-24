@@ -1,10 +1,10 @@
 # Runtime Image - SteamCMD
 
-Docker image for **runtime execution** of Arma Reforger servers in Pterodactyl Panel.
+Docker image for **runtime execution** of game servers in Pterodactyl Panel.
 
 ## Purpose
 
-This image runs and executes the game server after installation. It includes an entrypoint script that handles:
+This image runs and executes game servers after installation. It includes an entrypoint script that handles:
 - Pterodactyl STARTUP command processing
 - Optional automatic updates via SteamCMD
 - Environment variable substitution
@@ -14,7 +14,7 @@ This image runs and executes the game server after installation. It includes an 
 
 **Tags:**
 - `fabriciojrsilva/steamcmd-eggs:latest` (recommended)
-- `fabriciojrsilva/steamcmd-eggs:arma-reforger` (version-specific)
+- `fabriciojrsilva/steamcmd-eggs:arma-reforger` (game-specific)
 
 **Base:** `debian:bookworm-slim`
 
@@ -24,9 +24,11 @@ This image runs and executes the game server after installation. It includes an 
 
 ## What's Included
 
-- **32-bit Libraries:** `lib32gcc-s1`, `lib32stdc++6`
+- **32-bit Libraries:** `lib32gcc-s1`, `lib32stdc++6` (required for SteamCMD)
 - **Core Tools:** `curl`, `tar`, `jq`, `ca-certificates`
 - **Networking:** `iproute2`, `iputils-ping`, `net-tools`, `netcat-traditional`
+- **Process Management:** `procps`
+- **Memory Optimization:** `libjemalloc2` (for better memory management)
 - **Locale:** UTF-8 support
 - **Entrypoint:** `entrypoint.sh` for startup automation
 
@@ -254,19 +256,6 @@ cd /home/container && bash armareforger-server.sh
 
 ---
 
-## Comparison
-
-| Feature | cm2network/steamcmd | This Image |
-|---------|---------------------|------------|
-| Entrypoint for Pterodactyl | No | Yes |
-| Auto-Update Support | No | Yes |
-| Unified Install/Runtime | Separate images | Single image |
-| Process Management | Basic | Tini |
-| Pre-installed Tools | Minimal | jq, curl, etc. |
-| Base | Debian Bookworm | Debian Trixie-Slim |
-
----
-
 ## Troubleshooting
 
 ### Server doesn't start automatically
@@ -274,14 +263,27 @@ cd /home/container && bash armareforger-server.sh
 - Check container logs for error messages
 - Ensure the startup script exists and is executable
 
-### SteamCMD download fails
+### SteamCMD download fails during auto-update
 - Check network connectivity
 - Verify Steam credentials (for non-anonymous games)
-- Review the installation logs with `INSTALL_LOG=DEBUG`
+- Ensure `AUTO_UPDATE` is set correctly (0 or 1)
 
 ### Permission denied errors
 - Ensure files are owned by `container:container` (UID/GID 1000)
 - The installation script should set permissions correctly
+- Run reinstall if permissions are corrupted
+
+### ArmaReforgerServer binary not found
+- Server was not installed properly
+- Run **Reinstall** in Pterodactyl Panel using the installer image
+
+---
+
+## Related Documentation
+
+- [Installer Image](../installer/README.md) - Used during installation
+- [Entrypoint Script](entrypoint.sh) - Startup automation details
+- [Egg Configuration](../../eggs/arma-reforger/README.md) - Full egg documentation
 
 ---
 
@@ -289,17 +291,16 @@ cd /home/container && bash armareforger-server.sh
 
 - **GitHub Repository**: [github.com/binhotm/pterodactyl.eggs](https://github.com/binhotm/pterodactyl.eggs)
 - **Pterodactyl Panel**: [pterodactyl.io](https://pterodactyl.io)
-- **Discord Community**: [discord.gg/sasbr](https://discord.gg/sasbr)
 
 ---
 
 ## Author and Support
 
-Maintained by **Fabricio Junior Silva** (SAS BR)
+Maintained by **Fabricio Junior Silva**
 
 - Email: fabriciojuniorsilva@gmail.com
 - GitHub: [@binhotm](https://github.com/binhotm)
-- Discord: [discord.gg/sasbr](https://discord.gg/sasbr)
+- Discord: `mindisgurpe__`
 
 ---
 

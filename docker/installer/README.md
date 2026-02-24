@@ -1,10 +1,10 @@
 # Installer Image - SteamCMD
 
-Docker image for **installation phase only** in Pterodactyl Panel.
+Docker image for the **installation phase** in Pterodactyl Panel.
 
 ## Purpose
 
-This image is used by Pterodactyl Wings to execute installation scripts and download game server files via SteamCMD. It is **not used for runtime** - the game server runs in the runtime image.
+This image is used by Pterodactyl Wings to execute installation scripts and download game server files via SteamCMD. It is **not used for runtime** - the game server runs in the [runtime image](../steamcmd/).
 
 ## Image Details
 
@@ -12,7 +12,9 @@ This image is used by Pterodactyl Wings to execute installation scripts and down
 
 **Base:** `debian:bookworm-slim`
 
-**Size:** ~200MB
+**Size:** ~200MB (minimal and optimized)
+
+**Purpose:** Installation only - downloads game files via SteamCMD
 
 ## What's Included
 
@@ -101,13 +103,13 @@ Unlike the runtime image, this installer image has **no ENTRYPOINT or CMD** conf
 ## Notes
 
 - **Network Required:** Downloads SteamCMD and game files from Steam CDN
-- **Root User:** Installation runs as root (Pterodactyl requirement)
-- **Temporary:** Container is destroyed after installation completes
-- **No SteamCMD Pre-installed:** Downloaded fresh during each installation
-- **User ID:** Not relevant for installer (no user created)
+- **Root User:** Installation runs as root (Pterodactyl requirement for apt-get, chown, etc.)
+- **Temporary Container:** Destroyed after installation completes
+- **No Pre-installed SteamCMD:** Downloaded fresh by installation script
+- **Minimal:** Only includes essential tools for installation
 
-## Related
+## Related Documentation
 
 - [Runtime Image](../steamcmd/README.md) - Used to execute the server
 - [Installation Script](../../eggs/arma-reforger/installation-script.sh) - What gets executed
-- [Egg Configuration](../../eggs/arma-reforger/README.md) - Full egg docs
+- [Egg Configuration](../../eggs/arma-reforger/README.md) - Full egg documentation
