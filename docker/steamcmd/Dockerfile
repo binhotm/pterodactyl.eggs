@@ -27,6 +27,11 @@
 
 FROM        debian:bookworm-slim
 
+# Security floors from Debian Bookworm updates; fail builds if stale indexes regress them.
+ARG         VCS_REF=unknown
+ARG         GNUTLS_MIN_VERSION=3.7.9-2+deb12u7
+ARG         PERL_MIN_VERSION=5.36.0-7+deb12u4
+
 # ============================================
 # Image Identification Labels
 # ============================================
@@ -36,7 +41,8 @@ LABEL       author="Fabricio Junior Silva"
 # OCI Standard Labels
 LABEL       org.opencontainers.image.title="Pterodactyl SteamCMD Runtime"
 LABEL       org.opencontainers.image.description="Runtime image for Pterodactyl Panel. Executes game servers with auto-update support."
-LABEL       org.opencontainers.image.version="2.0.0"
+LABEL       org.opencontainers.image.version="2.0.1-security.20261026"
+LABEL       org.opencontainers.image.revision="${VCS_REF}"
 LABEL       org.opencontainers.image.source="https://github.com/binhotm/pterodactyl.eggs"
 LABEL       org.opencontainers.image.licenses="MIT"
 LABEL       org.opencontainers.image.authors="Fabricio Junior Silva <fabriciojuniorsilva@gmail.com>"
@@ -113,6 +119,8 @@ RUN         dpkg --add-architecture i386 \
             #
             # Cleanup to reduce image size
             #
+            && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libgnutls30)" ge "$GNUTLS_MIN_VERSION" \
+            && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' perl-base)" ge "$PERL_MIN_VERSION" \
             && apt-get clean \
             && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
